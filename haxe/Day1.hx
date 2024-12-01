@@ -8,10 +8,8 @@ using Lambda;
 class Day1 {
     static function main() {
         var lr = parse_file();
-        var pt1 = solution(lr.left, lr.right);
-        var pt2 = solution2(lr.left, lr.right);
-        Sys.println('Part 1: ${pt1}\nPart 2: ${pt2}');
-
+        var sol = solution(lr.left, lr.right);
+        Sys.println('Part 1: ${sol.pt1}\nPart 2: ${sol.pt2}');
     }
 
     static function parse_file() {
@@ -26,30 +24,14 @@ class Day1 {
     }
 
     static function solution(left: ANI, right: ANI) {
-        var ttl = 0;
+        var l_map: MII = [for (i in left) Std.int(i) => 0];
+        var ttl = 0, ttl2 = 0;
 
         for (i in 0...left.length) {
             ttl += Std.int(Math.abs(left[i] - right[i]));
+             if (l_map.exists(right[i])) ttl2 += right[i];
         }
 
-        return ttl;
-    }
-
-    static function solution2(left: ANI, right: ANI) {
-        var l_map: MII = [];
-
-        for (i in left) l_map[Std.int(i)] = 0;     
-        for (i in right) {
-            if (l_map.exists(i)) {
-                l_map[i] += 1;
-            }
-        }
-
-        var ttl = 0;
-        for (k => v in l_map) {
-            ttl += k * v;
-        }
-
-        return ttl;
+        return {pt1: ttl, pt2: ttl2};
     }
 }
