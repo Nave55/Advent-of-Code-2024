@@ -39,17 +39,12 @@ auto solution(const LR &lr) -> IntInt {
     int sum1 {0}, sum2 {0};
     std::unordered_map<int, int> map {};
 
-    for (size_t i = 0; i < lr.left.size(); ++i) 
+    for (const auto &i : lr.left) map[i] = 0;
+
+    for (size_t i = 0; i < lr.left.size(); ++i) {
         sum1 += abs(lr.left[i] -lr.right[i]);
-
-    for (const auto &i : lr.left) 
-        map[i] = 0;
-
-    for (const auto &i : lr.right) 
-        if (map.contains(i)) map[i]++;
-    
-    for (const auto &[k, v] : map) 
-        sum2 += k * v;
+        if (map.contains(lr.right[i])) sum2 += lr.right[i];
+    }
 
     return {sum1, sum2};
 }
