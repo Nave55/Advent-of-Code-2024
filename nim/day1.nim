@@ -1,11 +1,11 @@
-import strutils, strformat, algorithm, sequtils, sets
+import strutils, strformat, algorithm, sequtils, sets, sugar
 
 proc readInput(): (seq[int], seq[int]) =
     let file = open("input/Day1.txt")
     defer: file.close()
 
     for i in file.lines():
-        let lr = map(i.split("   "), proc(x: string): int = parseInt(x))
+        let lr = i.split("   ").map(item => parseInt(item))
 
         result[0] &= lr[0]
         result[1] &= lr[1]
