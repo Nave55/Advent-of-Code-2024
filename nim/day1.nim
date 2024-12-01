@@ -12,19 +12,17 @@ proc readInput(): (seq[int], seq[int]) =
 
     result[0].sort()
     result[1].sort()
-    return result
 
-let (l, r) = readInput()
-let left = l.toHashSet()
-var 
-    sum1 = 0
-    sum2 = 0
+proc solution(): (int, int) =    
+    let (l, r) = readInput()
+    let left = l.toHashSet()
 
-for i in 0..<l.len:
-    sum1 += abs(l[i] - r[i])
+    for i in 0..<l.len:
+        result[0] += abs(l[i] - r[i])
 
-for i in r:
-    if left.contains(i):
-        sum2 += i
+    for i in r:
+        if left.contains(i):
+            result[1] += i
 
+let (sum1, sum2) = solution()
 echo &"Part 1: {sum1}\nPart 2: {sum2}"
