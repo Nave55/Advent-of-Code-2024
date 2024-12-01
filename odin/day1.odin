@@ -9,8 +9,7 @@ import "core:strings"
 main :: proc() {
 	left, right := parse_file("input/day1.txt")
 	defer { delete(left); delete(right) }
-	pt1 := solution(left[:], right[:])
-	pt2 := solution2(left[:], right[:])
+	pt1, pt2 := solution(left[:], right[:])
 	fmt.printf("Part 1 = %v\nPart 2 = %v\n", pt1, pt2)
 }
 
@@ -33,30 +32,13 @@ parse_file :: proc(filepath: string) -> (left, right: [dynamic]int) {
 	return
 }
 
-solution :: proc(left: []int, right: []int) -> (sum: int) {
+solution :: proc(left: []int, right: []int) -> (ttl1, ttl2: int) {
+	l_map := make(map[int]int, context.temp_allocator)
+	for i in left do l_map[i] = 0
+
 	for i in 0..<len(left) {
-		sum += abs(left[i] - right[i])
-	}
-
-	return
-}
-
-solution2 :: proc(left: []int, right: []int) -> (sum: int) {
-	l_map := make(map[int]int)
-	defer delete(l_map)
-
-	for i in left {
-		l_map[i] = 0
-	}
-
-	for i in right {
-		if i in l_map {
-			l_map[i] += 1
-		}
-	}
-
-	for i, v in l_map {
-		sum += i * v
+		ttl1 += abs(left[i] - right[i])
+		if right[i] in l_map do ttl2 += right[i]
 	}
 
 	return
