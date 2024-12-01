@@ -13,7 +13,7 @@ class Day1 {
     }
 
     static function parse_file() {
-        var con = [for (i in sys.io.File.getContent('input/Day1.txt').split("\r")) [for (j in i.split("   ")) parseInt(j)]];
+        var con = [for (i in sys.io.File.getContent('input/Day1.txt').split("\r")) [for (j in i.split("   ")) parseInt(j) ?? 0]];
         var left = [for (i in con) i[0]];
         var right = [for (i in con) i[1]];
 
@@ -24,7 +24,7 @@ class Day1 {
     }
 
     static function solution(left: ANI, right: ANI) {
-        var l_map: MII = [for (i in left) Std.int(i) => 0];
+        var l_map: MII = [for (i in left) i => 0];
         var ttl = 0, ttl2 = 0;
 
         for (i in 0...left.length) {
