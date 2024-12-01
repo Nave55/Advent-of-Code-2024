@@ -17,12 +17,10 @@ proc solution(): (int, int) =
     let (l, r) = readInput()
     let left = l.toHashSet()
 
-    for i in 0..<l.len:
+    for i in 0..<r.len:
         result[0] += abs(l[i] - r[i])
-
-    for i in r:
-        if left.contains(i):
-            result[1] += i
+        if left.contains(r[i]):
+            result[1] += r[i]
 
 let (sum1, sum2) = solution()
 echo &"Part 1: {sum1}\nPart 2: {sum2}"
