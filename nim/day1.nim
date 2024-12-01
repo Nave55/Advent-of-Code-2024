@@ -14,7 +14,6 @@ proc readInput(): (seq[int], seq[int]) =
     result[1].sort()
     return result
 
-
 let (l, r) = readInput()
 let left = l.toHashSet()
 var 
