@@ -1,1 +1,3 @@
-### using https://github.com/TartanLlama/tl and boost libraries
+## Libraries - 
+#### https://github.com/TartanLlama/tl 
+#### https://www.boost.org/
