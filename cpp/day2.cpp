@@ -21,14 +21,14 @@ auto solver(const vi &arr, bool pt1, size_t n = 0) -> int {
 
     for (size_t j {1}; j < tmp.size(); ++j) {
         auto dist = tmp[j - 1] - tmp[j];
-        if (p > 0) {
+        if (p >= 0) {
             if (dist > 3 || dist <= 0) {
                 if (pt1) return 0;
                 break;
             }
             if (j == tmp.size() - 1) return 1;
         }
-        else if (p < 0) {
+        else if (p <= 0) {
             if (dist < -3 || dist >= 0) {
                 if (pt1) return 0;
                 break;
