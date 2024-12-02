@@ -22,13 +22,13 @@ func solver(arr: IntSeq, n: int, pt1: bool): int =
 
     for j in 1..<tmp.len():
         let dist = tmp[j - 1] - tmp[j]
-        if p > 0:
+        if p >= 0:
             if dist > 3 or dist <= 0:
                 if pt1: return 0
                 break
             if j == tmp.len() - 1:
                 return 1
-        elif p < 0:
+        elif p <= 0:
             if dist < -3 or dist >= 0:
                 if pt1: return 0
                 break
