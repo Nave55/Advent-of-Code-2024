@@ -15,10 +15,9 @@ fn solver(arr []int, n int, pt1 bool) int {
 		tmp.delete(n)
 	}
 	p := if tmp.len > 1 { tmp[0] - tmp[1] } else { 0 }
-
 	for j in 1 .. tmp.len {
 		dist := tmp[j - 1] - tmp[j]
-		if p > 0 {
+		if p >= 0 {
 			if dist > 3 || dist <= 0 {
 				if pt1 {
 					return 0
@@ -28,7 +27,7 @@ fn solver(arr []int, n int, pt1 bool) int {
 			if j == tmp.len - 1 {
 				return 1
 			}
-		} else if p < 0 {
+		} else if p <= 0 {
 			if dist < -3 || dist >= 0 {
 				if pt1 {
 					return 0
@@ -38,7 +37,7 @@ fn solver(arr []int, n int, pt1 bool) int {
 			if j == tmp.len - 1 {
 				return 1
 			}
-		}
+		} 
 	}
 
 	return solver(arr, n + 1, false)
