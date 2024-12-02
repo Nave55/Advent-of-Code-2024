@@ -3,8 +3,7 @@ import math
 
 fn main() {
 	a, b := parse_file()!
-	pt1 := solution(a, b)
-	pt2 := solution2(a, b)
+	pt1, pt2 := solution(a, b)
 	println('Part 1: ${pt1}\nPart 2: ${pt2}')
 }
 
@@ -25,32 +24,21 @@ fn parse_file() !([]int, []int) {
 	return left, right
 }
 
-fn solution(left []int, right []int) int {
+fn solution(left []int, right []int) (int, int) {
 	mut sum := 0
-	for i in 0 .. left.len {
-		sum += math.abs(left[i] - right[i])
-	}
-
-	return sum
-}
-
-fn solution2(left []int, right []int) int {
+	mut sum2 := 0
 	mut l_map := map[int]int{}
+
 	for i in left {
 		l_map[i] = 0
 	}
 
-	for i in right {
-		if i in l_map {
-			l_map[i] += 1
+	for i in 0 .. left.len {
+		sum += math.abs(left[i] - right[i])
+		if right[i] in l_map {
+			sum2 += right[i]
 		}
 	}
 
-	mut ttl := 0
-
-	for i, v in l_map {
-		ttl += i * v
-	}
-
-	return ttl
+	return sum, sum2
 }
