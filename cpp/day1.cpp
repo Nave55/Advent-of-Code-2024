@@ -6,20 +6,16 @@
 #include <algorithm>
 #include <unordered_map>
 
-struct LR {std::vector<int> left {}; std::vector<int> right {};};
-struct IntInt {int pt1 {0}; int pt2 {0};};
-
-auto parseFile(const std::string &filename) -> LR;
-auto solution(const LR &lr) -> IntInt;
+struct Pt1Pt2 {int pt1 {0}; int pt2 {0};};
+auto solution() -> Pt1Pt2;
 
 auto main() -> int {
-    auto lr = parseFile("input/Day1.txt");
-    auto [sum1, sum2] =  solution(lr);
+    auto [sum1, sum2] =  solution();
     printf("Part 1: %d\nPart 2: %d", sum1, sum2);
 }
 
-auto parseFile(const std::string &filename) -> LR {
-    std::ifstream file (filename);
+auto solution() -> Pt1Pt2 {
+    std::ifstream file ("input/Day1.txt");
     auto lines = tl::views::getlines(file) | tl::to<std::vector<std::string>>();
     vi left {}, right {};
 
@@ -32,18 +28,14 @@ auto parseFile(const std::string &filename) -> LR {
     std::sort(left.begin(), left.end());
     std::sort(right.begin(), right.end());
 
-    return {left, right};
-}
-
-auto solution(const LR &lr) -> IntInt {
     int sum1 {0}, sum2 {0};
     std::unordered_map<int, int> map {};
 
-    for (const auto &i : lr.left) map[i] = 0;
+    for (const auto &i : left) map[i] = 0;
 
-    for (size_t i = 0; i < lr.left.size(); ++i) {
-        sum1 += abs(lr.left[i] -lr.right[i]);
-        if (map.contains(lr.right[i])) sum2 += lr.right[i];
+    for (size_t i = 0; i < left.size(); ++i) {
+        sum1 += abs(left[i] - right[i]);
+        if (map.contains(right[i])) sum2 += right[i];
     }
 
     return {sum1, sum2};
