@@ -14,7 +14,7 @@ main :: proc() {
 solver :: proc(arr: []int, n: int, pt1: bool) -> int {
     if n == len(arr) do return 0
 
-    tmp := slice.clone_to_dynamic(arr); defer delete(tmp)    
+    tmp := slice.clone_to_dynamic(arr, context.temp_allocator)    
     if !pt1 do ordered_remove(&tmp, n)
     p := len(tmp) > 1 ? tmp[0] - tmp[1] : 0 
 
