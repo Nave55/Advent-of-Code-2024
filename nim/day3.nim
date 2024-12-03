@@ -8,7 +8,7 @@ proc readInput(): seq[IntSeq] =
     defer: file.close()
 
     let 
-      pattern2 = re"mul\(\d+,\s*\d+\)|do\([^)]*\)|don't\([^)]*\)"      
+      pattern2 = re"mul\(\d+,\s*\d+\)|do\([^)]*)|don't\([^)]*\)"      
       replacements = @[
         ("mul", ""),
         ("(", ""),
