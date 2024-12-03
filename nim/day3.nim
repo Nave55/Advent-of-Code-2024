@@ -4,8 +4,6 @@ type
     IntSeq = seq[int]
 
 proc readInput(): seq[IntSeq] =
-    let file = readFile("input/day3.txt")
-
     let 
       pattern2 = re"mul\(\d+\,\d+\)|do(n't)?\(\)"      
       replacements = @[
@@ -16,11 +14,13 @@ proc readInput(): seq[IntSeq] =
         ("don't()", "0")
       ]
         
-    let m2 = findAll(file, pattern2).join(" ").multiReplace(replacements).split(" ")    
+    result = readFile("input/day3.txt")
+            .findAll(pattern2)
+            .join(" ")
+            .multiReplace(replacements)
+            .split(" ")
+            .map(item => item.split(",").map(item => item.parseInt()))    
     
-    for i in m2:
-      result &= i.split(",").map(item => item.parseInt())
-
 proc solution(): (int, int) =
   let m1 = readInput()
   var mul = true
