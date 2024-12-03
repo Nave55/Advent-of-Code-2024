@@ -4,7 +4,7 @@ type IntSeq = seq[int]
 
 proc readInput(): seq[IntSeq] =
     let 
-      pattern2 = re"mul\(\d+\,\d+\)|do(n't)?\(\)"      
+      pattern = re"mul\((\d+),(\d+)\)|(do(n't)?\(\))"      
       replacements = @[
         ("mul", ""),
         ("(", ""),
@@ -12,9 +12,9 @@ proc readInput(): seq[IntSeq] =
         ("do()", "1"),
         ("don't()", "0")
       ]
-        
+
     result = readFile("input/day3.txt")
-            .findAll(pattern2)
+            .findAll(pattern)
             .join(" ")
             .multiReplace(replacements)
             .split(" ")
