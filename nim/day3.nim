@@ -1,7 +1,6 @@
 import strutils, strformat, sequtils, sugar, re
 
-type
-    IntSeq = seq[int]
+type IntSeq = seq[int]
 
 proc readInput(): seq[IntSeq] =
     let 
