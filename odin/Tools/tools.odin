@@ -26,12 +26,11 @@ nbrs :: proc(arr: [$A][$B]$T, loc: [2]int, $N: int, diag: bool = false) -> (indi
 }
 
 regexFind :: proc(str, pattern: string, slide: int = 1) -> (arr: [dynamic]regex.Capture) {
-    re, _ := regex.create(pattern, {.Global}); 
-    defer { regex.destroy(re); delete(arr) }
+    re, _ := regex.create(pattern, {.Global}, context.temp_allocator); 
     
     ind := 0
     for ind < len(str) {
-        res, pass := regex.match_and_allocate_capture(re, str[ind:], context.temp_allocator)
+        res, pass := regex.match_and_allocate_capture(re, str[ind:])
         if pass {
             ind += res.pos[0][1]
             append(&arr, res)
