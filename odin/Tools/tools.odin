@@ -35,9 +35,7 @@ regexFind :: proc(str, pattern: string, slide: int = 1) -> (arr: [dynamic]regex.
             ind += res.pos[0][1]
             append(&arr, res)
         }
-        else {
-            ind += slide
-        }
+        else do ind += slide
     }
     return
 }
