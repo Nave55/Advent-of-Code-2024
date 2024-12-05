@@ -3,7 +3,6 @@ package AoC
 import "../Tools"
 import sa "core:container/small_array"
 import "core:fmt"
-import "core:mem"
 import "core:os"
 import "core:strings"
 import "core:unicode/utf8"
@@ -13,20 +12,24 @@ main :: proc() {
 }
 
 solution :: proc(filepath: string) {
-	arr: [dynamic]string
+	arr: [dynamic][]rune
 	data, ok := os.read_entire_file(filepath)
 	if !ok do return
 	it := string(data)
 	defer {delete(arr);delete(data)}
 
-	for line in strings.split_lines_iterator(&it) do append(&arr, line)
+	for line in strings.split_lines_iterator(&it) {
+		tmp := utf8.string_to_runes(line)
+		append(&arr, tmp)
+	}
+	defer { for i in arr do delete(i) }
 
 	pt1 := checkXmas(&arr)
 	pt2 := checkX(&arr)
 	fmt.printfln("Part 1: %v\nPart 2: %v", pt1, pt2)
 }
 
-checkXmas :: proc(mat: ^[dynamic]string) -> (ttl: u32) {
+checkXmas :: proc(mat: ^[dynamic][]rune) -> (ttl: u32) {
 	width, height := len(mat[0]), len(mat)
 	dirs: [24][2]int = {
 		{-3, -3},
@@ -85,7 +88,7 @@ checkXmas :: proc(mat: ^[dynamic]string) -> (ttl: u32) {
 	return
 }
 
-checkX :: proc(mat: ^[dynamic]string) -> (ttl: u32) {
+checkX :: proc(mat: ^[dynamic][]rune) -> (ttl: u32) {
 	valid_inds := make([dynamic][2]int)
 	defer delete(valid_inds)
 	for r_val, r_ind in mat {
@@ -105,4 +108,3 @@ checkX :: proc(mat: ^[dynamic]string) -> (ttl: u32) {
 	}
 	return
 }
-
