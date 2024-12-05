@@ -1,17 +1,16 @@
 package tools
 
-import "core:fmt"
 import "core:text/regex"
 import "core:unicode/utf8"
 
-arrValue :: proc(arr: ^[dynamic]$T, arr2: [2]int, $R: typeid) -> R {
+arrValue :: proc(arr: ^$T, arr2: [2]int, $R: typeid) -> R {
 	when R == rune do return rune(arr[arr2.x][arr2.y])
 	when R != rune do return arr[arr2.x][arr2.y]
 	return 0
 }
 
 nbrs :: proc(
-	arr: ^[dynamic]$T,
+	arr: ^$T,
 	loc: [2]int,
 	$N: int,
 	$F: bool,
