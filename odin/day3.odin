@@ -1,73 +1,41 @@
-package AoC_2023
+package AoC
 
 import "core:fmt"
-import "core:strings"
 import "core:os"
+import "core:strings"
 import "core:strconv"
-import "core:slice"
-import "core:math"
-import "core:unicode/utf8"
-import "core:unicode"
+import "core:mem"
+import "../Tools"
 
-Directory :: struct {
-    num, x, y : int,
-    rng : []int
-}
+Arena: mem.Dynamic_Arena
 
 main :: proc() {
-    solution("./AoC Files/Day3.txt")
+    mem.dynamic_arena_init(&Arena)
+    arena_allocator := mem.dynamic_arena_allocator(&Arena)
+    context.allocator = arena_allocator
+    defer mem.dynamic_arena_destroy(&Arena)
+    
+    solution("input/day3.txt")
 }
 
 solution :: proc(filepath: string) {
+    RE :: "mul\\((\\d+,\\d+)\\)|don't\\(\\)|do\\(\\)"
     data, ok := os.read_entire_file(filepath)
     if !ok do return 
-    
     it := string(data)
-    arr:  [dynamic]string
-    for line in strings.split_lines_iterator(&it) do append(&arr,line)
+    pt1, pt2, mul := 0, 0, true
+    arr := Tools.regexFind(it, RE, 23)
     
-    sym_dir: [dynamic]Directory
-    num_dir: [dynamic]Directory
-    defer { 
-        for i in num_dir do delete(i.rng)
-        delete(data); delete(arr); delete(sym_dir); delete(num_dir) 
-    } 
-    
-    for i in 0..<len(arr) {
-        tmp_num: [dynamic]rune
-        tmp_rng: [dynamic]int
-        defer {delete(tmp_num); delete(tmp_rng)}
-        
-        for j in 0..<len(arr) {
-            defer free_all(context.temp_allocator)
-            if rune(arr[i][j]) != '.' && ! unicode.is_digit(rune(arr[i][j])) {
-                append(&sym_dir, Directory{x = j, y = i})
-            } 
-            if unicode.is_digit(rune(arr[i][j])) {
-                append(&tmp_num,rune(arr[i][j]))
-                append(&tmp_rng, j)
-            }
-            if (!unicode.is_digit(rune(arr[i][j])) || j == len(arr) - 1 ) && len(tmp_num) > 0 {
-                tmp := utf8.runes_to_string(tmp_num[:], context.temp_allocator)
-                append(&num_dir, Directory{num = strconv.atoi(tmp), x = j-1, y = i, rng = slice.clone(tmp_rng[:])})
-                clear(&tmp_num); clear(&tmp_rng)
+    for i in &arr {
+        defer free_all(context.temp_allocator)
+        if len(i.groups) == 1 do mul = i.groups[0] == "do()" ? true : false
+        else {
+                tmp := strings.split(i.groups[1], ",", context.temp_allocator)
+                parsed: [2]int = {strconv.atoi(tmp[0]), strconv.atoi(tmp[1])};
+                pt1 += parsed.x * parsed.y
+                if mul do pt2 += parsed.x * parsed.y
             }
         }
-    }
-
-    pt1, pt2 := 0, 0
-    for i in sym_dir {
-        tmp : [dynamic]int; defer delete(tmp)
-        for j in num_dir {
-            if slice.contains(j.rng,i.x) && (j.y == i.y+1 || j.y == i.y-1) ||
-               slice.contains(j.rng,i.x+1) && (j.y == i.y || j.y == i.y-1 || j.y == i.y+1) ||
-               slice.contains(j.rng,i.x-1) && (j.y == i.y+1 || j.y == i.y || j.y == i.y-1) {
-                pt1 += j.num
-                append(&tmp,j.num)
-            }
-        }   
-        if len(tmp) == 2 do pt2 += math.prod(tmp[:])
-    }
-
-    fmt.printf("Part 1: %v\nPart 2: %v\n", pt1, pt2)
+    
+    fmt.printfln("Part 1: %v\nPart 2: %v", pt1, pt2)
 }
