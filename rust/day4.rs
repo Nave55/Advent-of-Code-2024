@@ -106,9 +106,9 @@ fn check_x(mat: &Vec<Vec<char>>) -> i32 {
     let mut ttl = 0;
     let mut valid_inds: Vec<[i32; 2]> = Vec::new();
     for (r_ind, r_val) in mat.iter().enumerate() {
-        for (c_ind, c_val) in r_val.iter().enumerate() {
+        for (c_ind, &c_val) in r_val.iter().enumerate() {
             let tmp = [r_ind as i32, c_ind as i32];
-            if *c_val == 'A' {
+            if c_val == 'A' {
                 valid_inds.push(tmp);
             }
         }
