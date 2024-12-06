@@ -2,10 +2,11 @@ import sequtils, strformat, tools, tables, sets
 
 type 
     SSC = seq[seq[char]]
-    SSI = seq[seq[int]]
     SI = seq[int]
+    TSI = Table[SI, int]
+    HSI = HashSet[SI]
     
-proc readInput(): (SSC, SI, SSI, Table[SI, int]) =
+proc readInput(): (SSC, SI, TSI) =
     let file = open("input/day6.txt");
     defer: file.close()
 
@@ -19,21 +20,18 @@ proc readInput(): (SSC, SI, SSI, Table[SI, int]) =
         locs[@[r_ind, c_ind]] = 0     
         if c_val == '^':
           result[1] = @[r_ind, c_ind]
-        elif c_val == '.':
-          result[2] &= @[r_ind, c_ind]
           
-    result[3] = locs
+    result[2] = locs
   
-var (mat, start, empty, locs) = readInput()
+var (mat, start, locs) = readInput()
 let
   height = mat.len()
   width = mat[0].len()
   dirs = {0: @[-1, 0], 1: @[0, 1], 2: @[1, 0], 3: @[0, -1]}.toTable
     
-proc pt1(mat: SSC, start: SI): int =
+proc pt1(mat: SSC, start: SI): (int, HSI) =
   var 
     facing = 0
-    visited: SSI = @[]
     pos = start
   
   while (pos[0] > 0 and pos[0] < height - 1) and (pos[1] > 0 and pos[1] < width - 1):
@@ -43,12 +41,12 @@ proc pt1(mat: SSC, start: SI): int =
       if facing == 4:
         facing = 0
     else:
-      visited &= pos
+      result[1].incl(pos)
       pos = next_pos
 
-  return visited.toHashSet().len + 1
+  result[0] = result[1].len + 1
 
-proc pt2(mat: var SSC, start: SI, empty: SSI, locs: var Table[SI, int]): int =
+proc pt2(mat: var SSC, start: SI, empty: HSI, locs: var TSI): int =
   for i in empty:
     var
       facing = 0
@@ -62,7 +60,7 @@ proc pt2(mat: var SSC, start: SI, empty: SSI, locs: var Table[SI, int]): int =
         facing += 1
         locs[pos] += 1
         if locs[pos] == 3:
-          echo "Obstacle was at pos: [", i[0], ",", i[1], "]"  
+          echo &"Obstacle was at pos: [{i[0]},{i[1]}]" 
           inc result
           break
         if facing == 4:
@@ -74,6 +72,7 @@ proc pt2(mat: var SSC, start: SI, empty: SSI, locs: var Table[SI, int]): int =
       locs[key] = 0
     mat[i[0]][i[1]] = '.'
 
-let p1 = pt1(mat, start)
-let p2 = pt2(mat, start, empty, locs)
+let 
+  (p1, empty) = pt1(mat, start)
+  p2 = pt2(mat, start, empty, locs)
 echo &"Solution 1: {p1}\nSolution 2: {p2}"
