@@ -21,8 +21,8 @@ proc readInput(): (SSC, SI, TSI) =
           
 var (mat, start, locs) = readInput()
 let
-  height = mat.len()
-  width = mat[0].len()
+  height = mat.len() - 1 
+  width = mat[0].len() - 1
   dirs = {0: @[-1, 0], 1: @[0, 1], 2: @[1, 0], 3: @[0, -1]}.toTable
     
 proc pt1(mat: SSC, start: SI): (int, HSI) =
@@ -30,7 +30,7 @@ proc pt1(mat: SSC, start: SI): (int, HSI) =
     facing = 0
     pos = start
   
-  while (pos[0] > 0 and pos[0] < height - 1) and (pos[1] > 0 and pos[1] < width - 1):
+  while (pos[0] in 1..<height) and (pos[1] in 1..<width):
     let next_pos = pos + dirs[facing] 
     if arrValue(mat, next_pos) == '#':
       facing += 1
@@ -49,7 +49,7 @@ proc pt2(mat: var SSC, start: SI, empty: HSI, locs: var TSI): int =
       facing = 0
       pos = start
       
-    while (pos[0] > 0 and pos[0] < height - 1) and (pos[1] > 0 and pos[1] < width - 1):
+    while (pos[0] in 1..<height) and (pos[1] in 1..<width):
       let next_pos = pos + dirs[facing]
       if arrValue(mat, next_pos) == '#':
         facing += 1
