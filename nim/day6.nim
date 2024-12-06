@@ -44,12 +44,11 @@ proc pt1(mat: SSC, start: SI): (int, HSI) =
 
 proc pt2(mat: var SSC, start: SI, empty: HSI, locs: var TSI): int =
   for i in empty:
+    mat[i[0]][i[1]] = '#'
     var
       facing = 0
       pos = start
       
-    mat[i[0]][i[1]] = '#'
-
     while (pos[0] > 0 and pos[0] < height - 1) and (pos[1] > 0 and pos[1] < width - 1):
       let next_pos = pos + dirs[facing]
       if arrValue(mat, next_pos) == '#':
@@ -64,9 +63,9 @@ proc pt2(mat: var SSC, start: SI, empty: HSI, locs: var TSI): int =
       else:
         pos = next_pos
         
+    mat[i[0]][i[1]] = '.'
     for key in locs.keys:
       locs[key] = 0
-    mat[i[0]][i[1]] = '.'
 
 let 
   (p1, empty) = pt1(mat, start)
