@@ -13,16 +13,12 @@ proc readInput(): (SSC, SI, TSI) =
     for i in file.lines():
         result[0] &= i.toSeq()
 
-    var locs = initTable[SI, int]()
-    
     for r_ind, r_val in result[0]:
       for c_ind, c_val in r_val:
-        locs[@[r_ind, c_ind]] = 0     
+        result[2][@[r_ind, c_ind]] = 0     
         if c_val == '^':
           result[1] = @[r_ind, c_ind]
           
-    result[2] = locs
-  
 var (mat, start, locs) = readInput()
 let
   height = mat.len()
