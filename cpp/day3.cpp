@@ -17,34 +17,23 @@ auto solution() -> Pt1Pt2 {
     buffer << file.rdbuf();
     auto lines = buffer.str();
 
-    std::regex re("mul\\(\\d+,\\d+\\)|(do(n't)?\\(\\))");    
+    std::regex re(R"(mul\((\d+),(\d+)\)|do\(\)|don't\(\))");    
     auto words_begin = std::sregex_iterator(lines.begin(), lines.end(), re);
     auto words_end = std::sregex_iterator();
 
     int sum1 {0}, sum2 {0}, mul {true};
     for (std::regex_iterator i = words_begin; i != words_end; ++i) {
         std::smatch match = *i;
-        std::string str = match.str();
-        str = std::regex_replace(str, std::regex("mul\\("), ""); 
-        str = std::regex_replace(str, std::regex("\\)"), "");
-
-        if (str == "do(") {
-            mul = true;
-            continue;
+        if (match[0].str().substr(0, 4) == "mul(") {
+            auto x = stoi(match[1].str());
+            auto y = stoi(match[2].str());
+            if (mul) sum2 += x * y;
+            sum1 += x * y;
         }
-        else if (str == "don't(") {
-            mul = false;
-            continue;
+        else {
+            if (match[0].str() == "don't()") mul = false;
+            else mul = true;
         }
-        auto tmp = str 
-                | std::views::split(',')
-                | std::views::transform([](auto x) {
-                     return std::stoi(std::string(x.begin(), x.end()));
-                })
-                | std::ranges::to<std::vector<int>>();
-
-        sum1 += tmp[0] * tmp[1];
-        if (mul) sum2 += tmp[0] * tmp[1];
     }
 
     return {sum1, sum2};
