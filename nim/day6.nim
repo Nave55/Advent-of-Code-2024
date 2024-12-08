@@ -15,16 +15,17 @@ proc readInput(): (SSC, SI, TSI) =
 
     for r_ind, r_val in result[0]:
       for c_ind, c_val in r_val:
-        result[2][@[r_ind, c_ind]] = 0     
         if c_val == '^':
-          result[1] = @[r_ind, c_ind]
+          result[1] = @[r_ind, c_ind]        
+        if c_val == '#':
+          result[2][@[r_ind, c_ind]] = 0
           
 var (mat, start, locs) = readInput()
 let
-  height = mat.len() - 1 
   width = mat[0].len() - 1
+  height = mat.len() - 1 
   dirs = {0: @[-1, 0], 1: @[0, 1], 2: @[1, 0], 3: @[0, -1]}.toTable
-    
+  
 proc pt1(mat: SSC, start: SI): (int, HSI) =
   var 
     facing = 0
@@ -33,28 +34,30 @@ proc pt1(mat: SSC, start: SI): (int, HSI) =
   while (pos[0] in 1..<height) and (pos[1] in 1..<width):
     let next_pos = pos + dirs[facing] 
     if arrValue(mat, next_pos) == '#':
-      facing += 1
+      inc facing
       if facing == 4:
         facing = 0
     else:
       result[1].incl(pos)
       pos = next_pos
-
-  result[0] = result[1].len + 1
+      
+  result[1].incl(pos)
+  result[0] = result[1].len()
 
 proc pt2(mat: var SSC, start: SI, empty: HSI, locs: var TSI): int =
   for i in empty:
-    mat[i[0]][i[1]] = '#'
     var
       facing = 0
       pos = start
+    mat[i[0]][i[1]] = '#'
+    locs[i] = 0
       
     while (pos[0] in 1..<height) and (pos[1] in 1..<width):
       let next_pos = pos + dirs[facing]
       if arrValue(mat, next_pos) == '#':
-        facing += 1
-        locs[pos] += 1
-        if locs[pos] == 3:
+        inc facing 
+        inc locs[next_pos]
+        if locs[next_pos] == 5:
           echo &"Obstacle was at pos: [{i[0]},{i[1]}]" 
           inc result
           break
@@ -66,6 +69,7 @@ proc pt2(mat: var SSC, start: SI, empty: HSI, locs: var TSI): int =
     mat[i[0]][i[1]] = '.'
     for key in locs.keys:
       locs[key] = 0
+    locs.del(i)
 
 let 
   (p1, empty) = pt1(mat, start)
