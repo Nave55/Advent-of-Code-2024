@@ -26,7 +26,6 @@ class Day6 {
                 if (c_val == "#") locs['${r_ind},${c_ind}'] = 0;
             }
         }
-;
         return {mat: con, start: start, locs: locs}
     }
 
