@@ -22,7 +22,7 @@ proc sortArr(arr: SI, tab: HISI): (SI, bool) =
   var 
     sorted = false
     currentArr = arr
-  result[1] = true
+    no_changes = true
 
   while not sorted:
     sorted = true
@@ -34,9 +34,9 @@ proc sortArr(arr: SI, tab: HISI): (SI, bool) =
         if k_pos != -1 and i_pos > k_pos:
           (currentArr[i_pos], currentArr[k_pos]) = (currentArr[k_pos], currentArr[i_pos])
           sorted = false
-          result[1] = false
+          no_changes = false
 
-  return (currentArr, result[1])
+  return (currentArr, no_changes)
 
 proc solution(mat: SSI, tab: HISI): (int, int) =
   for i in mat:
