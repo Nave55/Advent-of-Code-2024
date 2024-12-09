@@ -44,7 +44,7 @@ proc solution(mat: SSI, tab: HISI): (int, int) =
          (arr, sorted) = sortArr(i, tab)
          n = ((arr.len() - 1) / 2).int()
       if sorted: 
-        result[0] += arr[int((arr.len() - 1) / 2)]
+        result[0] += arr[n]
       else:          
         result[1] += arr[n]
 
