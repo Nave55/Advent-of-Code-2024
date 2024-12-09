@@ -18,18 +18,25 @@ proc readInput(): (SSI, HISI) =
       if i != "" and i.contains(","):
         result[0] &= i.split(",").map(item => item.parseInt())
 
-proc sortArr(arr: SI, tab: HISI, sorted: bool = true): (SI, bool) =
-  var arr = arr
-  for i in arr:
-    for k in tab.getOrDefault(i, @[]):
-      if arr.contains(k):
+proc sortArr(arr: SI, tab: HISI): (SI, bool) =
+  var 
+    sorted = false
+    currentArr = arr
+  result[1] = true
+
+  while not sorted:
+    sorted = true
+    for i in currentArr:
+      for k in tab.getOrDefault(i, @[]):
         let
-          i_pos = arr.find(i)
-          k_pos = arr.find(k)          
-        if i_pos > k_pos:
-          (arr[i_pos], arr[k_pos]) = (arr[k_pos], arr[i_pos])
-          return sortArr(arr, tab, false)
-  return (arr, sorted)
+          i_pos = currentArr.find(i)
+          k_pos = currentArr.find(k)
+        if k_pos != -1 and i_pos > k_pos:
+          (currentArr[i_pos], currentArr[k_pos]) = (currentArr[k_pos], currentArr[i_pos])
+          sorted = false
+          result[1] = false
+
+  return (currentArr, result[1])
 
 proc solution(mat: SSI, tab: HISI): (int, int) =
   for i in mat:
