@@ -29,20 +29,24 @@ func `+` (a, b: TI): TI =
 func `-` (a, b: TI): TI =
   return (a.x - b.x, a.y - b.y)
 
+func `*`(a: TI, num: int): TI =
+  return (a.x * 2, a.y * 2) 
+
 func inBounds(tup: TI, width, height: int): bool =
   return (tup.x >= 0 and tup.x < height) and (tup.y >= 0 and tup.y < width)  
 
 func fetchVal(mat: SSC, tup: TI): char =
   return mat[tup.x][tup.y]
 
+func tupToStr(tup: TI): string =
+  return &"{tup.x},{tup.y}"
+
 func antSlopes(ants: HCSTI): HTSTI =
   for value in ants.values():
     for i in 0..<value.len() - 1:
       for j in i+1..<value.len():
         discard result.hasKeyOrPut(value[i], @[])
-        discard result.hasKeyOrPut(value[j], @[])
         result[value[i]] &= value[i] - value[j]
-        result[value[j]] &= value[i] - value[j]
 
 func solution(mat: SSC, ants: HCSTI, slopes: HTSTI, width, height: int): int =
   var ttl = initHashSet[string]()
@@ -51,23 +55,24 @@ func solution(mat: SSC, ants: HCSTI, slopes: HTSTI, width, height: int): int =
       var 
         symb = fetchVal(mat, key)
         pos = key + i
-        neg = key - i
+        neg = key - (i * 2)
       if inBounds(pos, width, height) and fetchVal(mat, pos) != symb:
-        ttl.incl(&"{pos.x},{pos.y}")
+        ttl.incl(pos.tupToStr())
       if inBounds(neg, width, height) and fetchVal(mat, neg) != symb:
-        ttl.incl(&"{neg.x},{neg.y}")
+        ttl.incl(neg.tupToStr())
 
   return ttl.len()
         
 func solution2(ants: HCSTI, slopes: HTSTI, width, height: int): int =
   var ttl = initHashSet[string]()
   for key, value in slopes:
+    ttl.incl(key.tupToStr())
     for i in value:
       var val = key
       while true:
         val = val + i
         if inBounds(val, width, height):
-          ttl.incl(&"{val.x},{val.y}")
+          ttl.incl(val.tupToStr())
         else:
           val = key
           break
@@ -77,7 +82,6 @@ func solution2(ants: HCSTI, slopes: HTSTI, width, height: int): int =
           ttl.incl(&"{val.x},{val.y}")
         else: 
           break
-
   return ttl.len()
     
 let 
@@ -85,5 +89,4 @@ let
   slopes = antSlopes(ants)
   pt1 = solution(mat, ants, slopes, width, height)
   pt2 = solution2(ants, slopes, width, height)
-  
 echo &"Solution 1: {pt1}\nSolution 2: {pt2}"
