@@ -1,6 +1,7 @@
 import haxe.macro.Type.AnonType;
 import haxe.macro.Expr;
 import haxe.Int64;
+import hx.strings.Char;
 import Std.*;
 import Math.*;
 
@@ -10,11 +11,13 @@ using hx.strings.Strings;
 typedef AS =   Array<String>;
 typedef AI =   Array<Int>;
 typedef AA =   Array<Any>;
+typedef AC = Array<Char>;
 typedef AF =   Array<Float>;
 typedef AI64 =  Array<Int64>;
 typedef ANI =  Array<Null<Int>>;
 typedef ANF =  Array<Null<Float>>;
 typedef AAS =  Array<Array<String>>;
+typedef AAC = Array<Array<Char>>;
 typedef AAI =  Array<Array<Int>>;
 typedef AAF =  Array<Array<Float>>;
 typedef AAA =   Array<Array<Any>>;
@@ -30,6 +33,7 @@ typedef MIS =  Map<Int,    String>;
 typedef MSS =  Map<String, String>;
 typedef MI64 = Map<Int,    Int64>;
 typedef MS64 = Map<String, Int64>;
+typedef Vec2 = {x: Int, y: Int};
 
 /**
  * [Reverse Iterator]
@@ -77,7 +81,7 @@ macro function swap(a:Expr, b:Expr) {
 }
 
 /**
- * [Adds the values of two arrays together to form a new array]
+ * [Creates a Vec which can do multiplication oprations]
  
     Example:
 
@@ -106,6 +110,78 @@ abstract Vec<T: Float>(Array<T>) {
     public inline function subArrs(arr: Array<T>): Array<T> {
         return [for (i in 0...arr.length) this[i] - arr[i]];
     }
+
+    @:op(A * B)
+    public inline function mulArrs(arr: Array<T>): Array<T> {
+        return [for (i in 0...arr.length) this[i] * arr[i]];
+    }
+
+    @:op(A * B)
+    public inline function mulbyScalar(num: Int): Array<T> {
+        return [for (i in 0...this.length) this[i] * num];
+    }
+}
+
+/**
+ * [Creates a Tuple struct which can do Vec2 math]
+ 
+    Example:
+
+        var arr1 = new Tup({x: 1, y: 2});
+
+        var arr2 = {x: 1, y: 2};
+
+        arr1 + arr2 -> {2, 4}
+        
+@param arr An Array<T: Float>
+@param arr2 An Array<T: Float>
+@return An AI
+*/
+
+abstract Tup(Vec2) {
+    public inline function new(s: Vec2) {
+      this = s;
+    }
+
+    @:op(A + B)
+    public inline function addVecs(vec: Vec2): Vec2 {
+        return {x: this.x + vec.x, y: this.y + vec.y};
+    }
+
+    @:op(A - B)
+    public inline function subVecs(vec: Vec2): Vec2 {
+        return {x: this.x - vec.x, y: this.y - vec.y};
+    }
+
+    @:op(A * B)
+    public inline function mulVecs(vec: Vec2): Vec2 {
+        return {x: this.x * vec.x, y: this.y * vec.y};
+    }
+
+    @:op(A++)
+    public inline function rtrnVec2(): Vec2 {
+        return {x: this.x, y: this.y};
+    }
+
+    @:op(A * B)
+    public inline function mulVecByScal(scalar: Int): Vec2 {
+        return {x: this.x * scalar, y: this.y * scalar};
+    }
+
+    // @:op(A - B)
+    // public inline function subVecs(arr: Array<T>): Array<T> {
+    //     return [for (i in 0...arr.length) this[i] - arr[i]];
+    // }
+
+    // @:op(A * B)
+    // public inline function mulVecs(arr: Array<T>): Array<T> {
+    //     return [for (i in 0...arr.length) this[i] * arr[i]];
+    // }
+
+    // @:op(A * B)
+    // public inline function mulbyScalar(num: Int): Array<T> {
+    //     return [for (i in 0...this.length) this[i] * num];
+    // }
 }
 
 /**
@@ -124,7 +200,7 @@ abstract Vec<T: Float>(Array<T>) {
 @return An AI
 */
 
-inline function arrValue(arr: AAA, arr2: AI) {
+inline function arrValue<T>(arr: Array<Array<T>>, arr2: AI) {
     return arr[arr2[0]][arr2[1]];
 }
 
@@ -145,14 +221,15 @@ inline function arrValue(arr: AAA, arr2: AI) {
 @return A struct of AAI and AA
 */
 
-function nbrs(arr: AAA, loc: AI, diag: Bool = false) {
+function nbrs<T>(arr: Array<Array<T>>, loc: AI, diag: String = "udlr") {
     var dir: AAI = [];
     var loc = new Vec(loc);
 
-    if (!diag) dir = [[-1, 0], [0, -1], [0, 1], [1, 0]];
-    else dir = [[-1, -1], [-1, 0], [-1, 1], [0, -1], [0, 1], [1, -1], [1, 0], [1, 1]];
+    if (diag == "udlr") dir = [[-1, 0], [0, -1], [0, 1], [1, 0]];
+    if (diag == "diag") dir = [[-1, -1], [1, -1], [-1, 1], [1, 1]];
+    if (diag == "both") dir = [[-1, -1], [-1, 0], [-1, 1], [0, -1], [0, 1], [1, -1], [1, 0], [1, 1]];
     var indices: AAI = [];
-    var vals: AA = [];
+    var vals: Array<T> = [];
     for (i in dir) {
         var tmp = loc + i;
         if (tmp[0] != -1 && tmp[1] != -1 && tmp[0] != arr.length && tmp[1] != arr[0].length) {
@@ -407,6 +484,20 @@ abstract Pipe<T>(T) to T {
         Sys.println(set1 | set2); -> [1, 2, 3, 4, 5];
  */
 
+
+    
+function arraysEqual<T>(arr1: Array<T>, arr2: Array<T>): Bool {
+    if (arr1.length != arr2.length) {
+        return false;
+    }
+    for (i in 0...arr1.length) {
+        if (arr1[i] != arr2[i]) {
+            return false;
+        }
+    }
+    return true;
+}
+ 
 @:generic
 abstract Set<T>(Array<T>) {
     public function new(set: Array<T>) {
@@ -418,7 +509,10 @@ abstract Set<T>(Array<T>) {
     }
 
     public inline function push(val: T) {
-        if (!this.contains(val)) this.push(val);
+        if (this.length > 0) {}
+        if (!this.contains(val)) {
+            this.push(val);
+        }
     } 
 
     @:op(A & B)
@@ -448,4 +542,59 @@ abstract Set<T>(Array<T>) {
     public inline function rtrnArray() {
         return this;
     }
+}
+
+/**
+ * [Checks if a Vec2 is in bounds given a width and height]
+ 
+    Example:
+        
+        inBounds({x: 5, y: 5}, 10, 10); -> true
+
+@param vec A Vec2.
+@param width A Int.
+@param vec A Int.
+@return A Bool
+*/
+
+function inBounds(vec: Vec2, width: Int, height: Int) {
+    return (vec.x >= 0 && vec.x < height) && (vec.y >= 0 && vec.y < width);
+}
+
+/**
+ * [Retrieves a position given by a Vec2 from a Matrix]
+ 
+    Example:
+        
+        var mat = [[1,2,3],[4,5,6]]
+        var vec: Vec2 = {x: 0, y: 0}
+         fetchVal(mat, vec); -> 1
+
+@param mat A 2d Array.
+@param vec a Vec2;
+@return A <T> value
+*/
+
+function fetchVal<T>(mat: Array<Array<T>>, vec: Vec2): T {
+    return mat[vec.x][vec.y];
+}
+
+/**
+ * [Returns a string repr of a Vec2]
+ 
+    Example:
+        
+        vecToStr({x: 1, y: 1}) -> "1,1"
+
+@param vec A Vec2.
+@return A String
+*/
+
+function vecToStr(vec: Vec2) {
+    return '${vec.x},${vec.y}';
+}
+
+function strToVec(str: String) {
+    var tmp = str.split(',').map(item -> parseInt(item) ?? 0);
+    return {x: tmp[0], y: tmp[1]};
 }
