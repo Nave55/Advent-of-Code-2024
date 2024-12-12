@@ -20,11 +20,15 @@ func diskMap(str: SI): (SI, SI) =
         result[1] &= tmp
 
 func valLocs(arr: SI, v: int): SI =
-  result = collect:
-    for i in countdown(arr.len() - 1, 0):
-      if arr[i] == -1: continue
-      if arr[i] == v:
-        i
+  var tmp = arr.find(v)
+  if tmp != -1:
+    result &= tmp
+    while tmp < arr.len() - 1:
+      tmp += 1
+      if arr[tmp] == v:
+        result &= tmp
+      else:
+        break
 
 func movePos(l, arr_pos: SI): SI =
   result = @[l[0]]
@@ -50,7 +54,7 @@ func orderDisk(d_map, locs: SI): SI =
     if val < result.len():
       result.insert(result.pop(), val)
 
-func orderDisk2(arr, locs: SI): SI =
+proc orderDisk2(arr, locs: SI): SI =
   var l = locs
   result = arr
   
@@ -70,7 +74,8 @@ func orderDisk2(arr, locs: SI): SI =
           result[i] = v
         
       l = l.filterIt(it notin start)
-
+      # echo v, " ", start, " ", arr_pos, "\n"
+      
 func solution(o_disk: SI): int64 =
   for ind, val in o_disk:
     if val != -1:
