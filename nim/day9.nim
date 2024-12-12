@@ -58,9 +58,9 @@ func orderDisk2(arr, locs: SI): SI =
     result.insert(-1, i)
     
   for v in countdown(arr[^1], 1):
-    var arr_pos = valLocs(result, v)   
+    let arr_pos = valLocs(result, v)   
     if arr_pos.len() == 0: continue
-    var start = movePos(l, arr_pos)
+    let start = movePos(l, arr_pos)
 
     if start.len() >= arr_pos.len():
       if start[0] < arr_pos[^1]:
@@ -70,7 +70,6 @@ func orderDisk2(arr, locs: SI): SI =
           result[i] = v
         
       l = l.filterIt(it notin start)
-      # echo v, " ", start, " ", arr_pos, "\n"
 
 func solution(o_disk: SI): int64 =
   for ind, val in o_disk:
