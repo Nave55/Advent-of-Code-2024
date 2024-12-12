@@ -1,3 +1,12 @@
+import Tables
+
+type 
+    TI = tuple[x, y: int]
+    HTSTI = Table[TI, seq[TI]]
+    HCSTI = Table[char, seq[TI]]
+    SC = seq[char]
+    SSC = seq[SC]
+
 proc `+`* [T](a: seq[T], b: seq[T]): seq[T] =
     var c: seq[T] = @[];
     for i in 0..<a.len(): 
@@ -6,7 +15,6 @@ proc `+`* [T](a: seq[T], b: seq[T]): seq[T] =
     
 proc arrValue*[T](arr: seq[seq[T]], ind: seq[int]): T =
     return arr[ind[0]][ind[1]]
-
 
 proc nbrs*[T](arr: seq[seq[T]], loc: seq[int], md: char = 'n'): (seq[seq[int]], seq[T]) =
     var dir: seq[seq[int]]
@@ -68,3 +76,21 @@ proc findMatches*[T](matrix: seq[seq[T]], pattern: string, rev: bool): int =
             if rev:
                 if r_cval[j..j+window].join("") == "XMAS":
                     inc result
+
+func `+`* (a, b: TI): TI =
+  return (a.x + b.x, a.y + b.y) 
+
+func `-`* (a, b: TI): TI =
+  return (a.x - b.x, a.y - b.y)
+
+func `*`* (a: TI, num: int): TI =
+  return (a.x * 2, a.y * 2) 
+
+func `*`* (a, b: TI): TI =
+  return (a.x * b.x, a.y * b.y) 
+
+func inBounds*(tup: TI, width, height: int): bool =
+  return (tup.x >= 0 and tup.x < height) and (tup.y >= 0 and tup.y < width)  
+
+func fetchVal*[T](mat: seq[seq[T]], tup: TI): char =
+  return mat[tup.x][tup.y]
