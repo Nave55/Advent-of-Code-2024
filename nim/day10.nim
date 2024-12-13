@@ -14,7 +14,7 @@ proc readInput(filename: string): SSI =
     for line in file.lines():
       line.toSeq().map(item => ord(item) - ord('0'))
 
-func bfs(mat: SSI, pos: TI, visited: var Visited): int =
+func bfs(mat: SSI, pos: TI, visited: var Visited, target: int = 9): int =
   var localVisited = Visited()
   var queue: seq[TI]
   queue &= pos
@@ -23,7 +23,7 @@ func bfs(mat: SSI, pos: TI, visited: var Visited): int =
 
   while queue.len() > 0:
     let current = queue.pop()
-    if mat.fetchVal(current) == 9:
+    if mat.fetchVal(current) == target:
       result += 1
 
     let (locs, nums) = nbrs(mat, current)
@@ -33,7 +33,7 @@ func bfs(mat: SSI, pos: TI, visited: var Visited): int =
         localVisited.incl(val)
         visited.incl(val)
 
-func dfs(mat: SSI, pos: TI, targetHeight: int, visited: var Visited): int =
+func dfs(mat: SSI, pos: TI, visited: var Visited, targetHeight: int = 9): int =
   if mat.fetchVal(pos) == targetHeight:
     return 1
 
@@ -41,7 +41,7 @@ func dfs(mat: SSI, pos: TI, targetHeight: int, visited: var Visited): int =
   let (neighbors, _) = nbrs(mat, pos)
   for neighbor in neighbors:
     if neighbor notin visited and mat.fetchVal(neighbor) == mat.fetchVal(pos) + 1:
-      result += dfs(mat, neighbor, targetHeight, visited)
+      result += dfs(mat, neighbor, visited)
   visited.excl(pos)
   
 func solution(mat: SSI): (int, int) =
@@ -53,7 +53,7 @@ func solution(mat: SSI): (int, int) =
       if c_val == 0: 
         if not pt1_visited.contains((r_ind, c_ind)):
           result[0] += bfs(mat, (r_ind, c_ind), pt1_visited)
-        result[1] += dfs(mat, (r_ind, c_ind), 9, pt2_visited)
+        result[1] += dfs(mat, (r_ind, c_ind), pt2_visited)
 
 let 
   mat = readInput("input/day10.txt")
