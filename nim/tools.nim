@@ -1,4 +1,4 @@
-import Tables
+import Tables, strformat, strutils, sequtils
 
 type 
     TI = tuple[x, y: int]
@@ -7,25 +7,51 @@ type
     SC = seq[char]
     SSC = seq[SC]
 
-proc `+`* [T](a: seq[T], b: seq[T]): seq[T] =
+func `+`* [T](a: seq[T], b: seq[T]): seq[T] =
     var c: seq[T] = @[];
     for i in 0..<a.len(): 
         c.add(a[i] + b[i])
     return c
     
-proc arrValue*[T](arr: seq[seq[T]], ind: seq[int]): T =
+func arrValue*[T](arr: seq[seq[T]], ind: seq[int]): T =
     return arr[ind[0]][ind[1]]
 
-proc nbrs*[T](arr: seq[seq[T]], loc: seq[int], md: char = 'n'): (seq[seq[int]], seq[T]) =
-    var dir: seq[seq[int]]
-    if md == 'n': dir = @[@[-1, 0], @[0, -1], @[0, 1], @[1, 0]]
-    elif md == 'b': dir = @[@[-1, -1], @[-1, 0], @[-1, 1], @[0, -1], @[0, 1], @[1, -1], @[1, 0], @[1, 1]]
-    elif md == 'd': dir = @[@[-1, -1], @[-1, 1], @[1, -1], @[1, 1]]
+func `+`* (a, b: TI): TI =
+  return (a.x + b.x, a.y + b.y) 
+
+func `-`* (a, b: TI): TI =
+  return (a.x - b.x, a.y - b.y)
+
+func `*`* (a: TI, num: int): TI =
+  return (a.x * 2, a.y * 2) 
+
+func `*`* (a, b: TI): TI =
+  return (a.x * b.x, a.y * b.y)
+
+
+func tupToStr*(tup: TI): string =
+    return &"{tup.x},{tup.y}"
+
+func strToTup*(str: string): TI =
+    let tmp = str.split(",").mapIt(parseInt(it))
+    return (tmp[0], tmp[1])
+
+func inBounds*(tup: TI, width, height: int): bool =
+  return (tup.x >= 0 and tup.x < height) and (tup.y >= 0 and tup.y < width)  
+
+func fetchVal*[T](mat: seq[seq[T]], tup: TI): T =
+  return mat[tup.x][tup.y]
+
+func nbrs*[T](arr: seq[seq[T]], loc: TI, md: char = 'n'): (seq[TI], seq[T]) =
+    var dir: seq[TI]
+    if md == 'n': dir = @[(-1, 0), (0, -1), (0, 1), (1, 0)]
+    elif md == 'b': dir = @[(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)]
+    elif md == 'd': dir = @[(-1, -1), (-1, 1), (1, -1), (1, 1)]
     for i in dir:
         let tmp = loc + i
-        if (tmp[0] != -1 and tmp[1] != -1 and tmp[0] <= arr.high and tmp[1] <= arr[0].high):
+        if inBounds(tmp, arr[0].len(), arr.len()):
             result[0] &= tmp
-            result[1] &= arrValue(arr, tmp)
+            result[1] &= fetchVal(arr, tmp)
     
 proc getDiagonals*[T](matrix: seq[seq[T]]): seq[seq[T]] =
     let rows = matrix.len
@@ -76,21 +102,3 @@ proc findMatches*[T](matrix: seq[seq[T]], pattern: string, rev: bool): int =
             if rev:
                 if r_cval[j..j+window].join("") == "XMAS":
                     inc result
-
-func `+`* (a, b: TI): TI =
-  return (a.x + b.x, a.y + b.y) 
-
-func `-`* (a, b: TI): TI =
-  return (a.x - b.x, a.y - b.y)
-
-func `*`* (a: TI, num: int): TI =
-  return (a.x * 2, a.y * 2) 
-
-func `*`* (a, b: TI): TI =
-  return (a.x * b.x, a.y * b.y) 
-
-func inBounds*(tup: TI, width, height: int): bool =
-  return (tup.x >= 0 and tup.x < height) and (tup.y >= 0 and tup.y < width)  
-
-func fetchVal*[T](mat: seq[seq[T]], tup: TI): char =
-  return mat[tup.x][tup.y]
