@@ -28,7 +28,6 @@ func `*`* (a: TI, num: int): TI =
 func `*`* (a, b: TI): TI =
   return (a.x * b.x, a.y * b.y)
 
-
 func tupToStr*(tup: TI): string =
     return &"{tup.x},{tup.y}"
 
