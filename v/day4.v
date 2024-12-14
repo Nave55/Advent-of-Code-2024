@@ -1,5 +1,5 @@
 import os
-import tools
+import tools {Vec2, nbrs, arr_value, in_bounds}
 
 fn main() {
 	pt1, pt2 := solution()!
@@ -23,16 +23,16 @@ fn check_xmas(mat [][]rune) u32 {
 	height := mat.len
 
 	dirs := [
-		[-3, -3], [-2, -2], [-1, -1], [-3, 3], [-2, 2], [-1, 1],
-		[3, -3], [2, -2], [1, -1], [3, 3], [2, 2], [1, 1],
-		[-3, 0], [-2, 0], [-1, 0], [3, 0], [2, 0], [1, 0],
-		[0, -3], [0, -2], [0, -1], [0, 3], [0, 2], [0, 1]
+		Vec2[int]{-3, -3}, Vec2[int]{-2, -2}, Vec2[int]{-1, -1}, Vec2[int]{-3, 3}, Vec2[int]{-2, 2}, Vec2[int]{-1, 1},
+		Vec2[int]{3, -3}, Vec2[int]{2, -2}, Vec2[int]{1, -1}, Vec2[int]{3, 3}, Vec2[int]{2, 2}, Vec2[int]{1, 1},
+		Vec2[int]{-3, 0}, Vec2[int]{-2, 0}, Vec2[int]{-1, 0}, Vec2[int]{3, 0}, Vec2[int]{2, 0}, Vec2[int]{1, 0},
+		Vec2[int]{0, -3}, Vec2[int]{0, -2}, Vec2[int]{0, -1}, Vec2[int]{0, 3}, Vec2[int]{0, 2}, Vec2[int]{0, 1}
 		]
 
-	mut valid_inds := [][]int{}
+	mut valid_inds := []Vec2[int]{}
 	for r_ind, r_val in mat {
 		for c_ind, c_val in r_val {
-			tmp := [r_ind, c_ind]
+			tmp := Vec2{r_ind, c_ind}
 			if c_val == `X` {
 				valid_inds << tmp
 			}
@@ -45,9 +45,9 @@ fn check_xmas(mat [][]rune) u32 {
 		mut str := []rune{}
 		for val in dirs {
 			cnt++
-			tmp := tools.add_arrs([val[0], val[1]], v)
-			if (tmp[0] >= 0 && tmp[0] < height) && (tmp[1] >= 0 && tmp[1] < width) {
-				str << rune(mat[tmp[0]][tmp[1]])
+			tmp := val + v
+			if in_bounds(tmp, height, width) {
+				str << rune(arr_value(mat, tmp))
 			}
 			if cnt % 3 == 0 {
 				str << `X`
@@ -64,17 +64,17 @@ fn check_xmas(mat [][]rune) u32 {
 
 fn check_x(mat [][]rune) u32 {
 	mut ttl := u32(0)
-	mut valid_inds := [][]int{}
+	mut valid_inds := []Vec2[int]{}
 	for r_ind, r_val in mat {
 		for c_ind, c_val in r_val {
 			if c_val == `A` {
-				valid_inds << [r_ind, c_ind]
+				valid_inds << Vec2[int]{r_ind, c_ind}
 			}
 		}
 	}
 
 	for i in valid_inds {
-		_, vals := tools.nbrs(mat, [i[0], i[1]], `d`)
+		_, vals := nbrs(mat, i, `d`)
 		tmp := vals.string()
 		if tmp in ["MMSS", "SSMM", "SMSM", "MSMS"] {
 			ttl++
