@@ -31,7 +31,7 @@ class Day7 {
         if (index == nums.length) return cur_value == target;
 
         var num = nums[index];
-        if (solver(nums, target, index + 1, Int64.add(cur_value,num), pt1)) return true;
+        if (solver(nums, target, index + 1, cur_value + num, pt1)) return true;
         if (solver(nums, target, index + 1, cur_value * num, pt1)) return true;
         if (!pt1 && solver(nums, target, index + 1, concat(cur_value, num), pt1)) return true;
         return false;
