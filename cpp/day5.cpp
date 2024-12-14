@@ -37,7 +37,7 @@ auto parseFile() -> ParseFile {
 }
 
 auto sortArr(vi arr, const std::unordered_map<int, vi> &mp) -> SortArr {
-    auto sorted =false;
+    auto sorted = false;
     auto no_changes = true;
 
     while (!sorted) {
