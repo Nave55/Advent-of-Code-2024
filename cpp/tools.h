@@ -9,6 +9,7 @@
 #include <sstream>
 #include <memory>
 #include <math.h>
+#include <utility>
 
 typedef std::vector<int> vi;
 typedef std::vector<std::vector<int>> vvi;
@@ -42,6 +43,12 @@ std::ostream &operator<<(std::ostream &os, const std::array<T, N> &arr) {
         }
     }
     os << "]\n";
+    return os;
+}
+
+template <typename T>
+std::ostream &operator<<(std::ostream &os, const std::pair<T, T> &pair) {
+    os << "[" << pair.first << ", " << pair.second << "]\n";
     return os;
 }
 
@@ -129,6 +136,21 @@ std::vector<T> tSplit(const std::string &s, const char del = ',', bool is_int = 
 //     return result;
 // }
 
+template <typename T>
+std::pair<T, T> operator+(const std::pair<T, T> &arr, const std::pair<T, T> &arr2) {
+    return {arr.first + arr2.first, arr.second + arr2.second};
+}
+
+template <typename T>
+std::pair<T, T> operator-(const std::pair<T, T> &arr, const std::pair<T, T> &arr2) {
+    return {arr.first - arr2.first, arr.second - arr2.second};
+}
+
+template <typename T>
+std::pair<T, T> operator*(const std::pair<T, T> &arr, T scalar) {
+    return {arr.first * scalar, arr.second * scalar};
+}
+
 template <typename T, std::size_t N>
 std::array<T, N> operator+(const std::array<T, N> &arr, const std::array<T, N> &arr2) {
     std::array<T, N> result {};
@@ -161,29 +183,46 @@ T arrValue(const std::vector<std::vector<T>> &arr, const std::array<int, 2> &arr
     return arr[arr2[0]][arr2[1]];
 }
 
-template <typename T, typename V, std::size_t N>
+template <typename T>
+T arrValue(const std::vector<std::vector<T>> &arr, const std::pair<int, int> &arr2) {
+    return arr[arr2.first][arr2.second];
+}
+
+template <typename T>
+bool inBounds(const std::vector<std::vector<T>> &arr, const std::pair<int, int> &pos) {
+    return (pos.first >= 0 && pos.second >= 0 && static_cast<size_t>(pos.first) < arr.size() && static_cast<size_t>(pos.second) < arr[0].size());    
+}
+
+bool inBounds(const std::pair<int, int> &pos, size_t height, size_t width) {
+    return (pos.first >= 0 && pos.second >= 0 && static_cast<size_t>(pos.first) < height && static_cast<size_t>(pos.second) < width);   
+}
+
+template <typename V, std::size_t N>
 struct Nbrs {
-    std::array<std::array<int, 2>, N> indices {};
+    std::array<std::pair<int, int>, N> indices {};
     std::array<V, N> vals {};
     std::size_t size = 0; // To keep track of actual filled elements
 };
 
-template <typename T, typename V, std::size_t N>
-Nbrs<T, V, N> nbrs(const std::vector<std::vector<V>> &arr, const std::array<int, 2> &loc, char type = 'n') {
-    std::array<std::array<int, 2>, 8> all = {{{-1, -1}, {-1, 0}, {-1, 1}, {0, -1}, {0, 1}, {1, -1}, {1, 0}, {1, 1}}};
-    std::array<std::array<int, 2>, 4> diag = {{{-1, -1}, {-1, 1}, {1, -1}, {1, 1}}};
-    std::array<std::array<int, 2>, 4>  lrup = {{{-1, 0}, {0, -1}, {0, 1}, {1, 0}}};
+template <typename V, std::size_t N>
+Nbrs<V, N> nbrs(const std::vector<std::vector<V>> &arr, const std::pair<int, int> &loc, char type = 'n') {
+    auto height = arr.size();
+    auto width = arr[0].size();
+
+    std::array<std::pair<int, int>, 8> all = {{{-1, -1}, {-1, 0}, {-1, 1}, {0, -1}, {0, 1}, {1, -1}, {1, 0}, {1, 1}}};
+    std::array<std::pair<int, int>, 4> diag = {{{-1, -1}, {-1, 1}, {1, -1}, {1, 1}}};
+    std::array<std::pair<int, int>, 4>  lrup = {{{-1, 0}, {0, -1}, {0, 1}, {1, 0}}};
     
-    Nbrs<T, V, N> result;
+    Nbrs<V, N> result;
     
     auto cnt = 0;
 
     if (type == 'n') {
         for (const auto &i : lrup) {
-            std::array<int, 2> tmp = {loc[0] + i[0], loc[1] + i[1]};
-            if (tmp[0] != -1 && tmp[1] != -1 && static_cast<size_t>(tmp[0]) < arr.size() && static_cast<size_t>(tmp[1]) < arr[0].size()) {
+            std::pair<int, int> tmp = {loc.first + i.first, loc.second + i.second};
+            if (inBounds(tmp, height, width)) {
                 result.indices[result.size] = tmp;
-                result.vals[result.size] = arr[tmp[0]][tmp[1]];
+                result.vals[result.size] = arrValue(arr, tmp);
                 result.size++;
             }
             cnt++;
@@ -191,10 +230,10 @@ Nbrs<T, V, N> nbrs(const std::vector<std::vector<V>> &arr, const std::array<int,
     }
     if (type == 'd') {
         for (const auto &i : diag) {
-            std::array<int, 2> tmp = {loc[0] + i[0], loc[1] + i[1]};
-            if (tmp[0] != -1 && tmp[1] != -1 && static_cast<size_t>(tmp[0]) < arr.size() && static_cast<size_t>(tmp[1]) < arr[0].size()) {
+            std::pair<int, int> tmp = {loc.first + i.first, loc.second + i.second};
+            if (inBounds(tmp, height, width)) {
                 result.indices[result.size] = tmp;
-                result.vals[result.size] = arr[tmp[0]][tmp[1]];
+                result.vals[result.size] = arrValue(arr, tmp);
                 result.size++;
             }
             cnt++;
@@ -202,10 +241,10 @@ Nbrs<T, V, N> nbrs(const std::vector<std::vector<V>> &arr, const std::array<int,
     }
     if (type == 'a') {
         for (const auto &i : all) {
-            std::array<int, 2> tmp = {loc[0] + i[0], loc[1] + i[1]};
-            if (tmp[0] != -1 && tmp[1] != -1 && static_cast<size_t>(tmp[0]) < arr.size() && static_cast<size_t>(tmp[1]) < arr[0].size()) {
+            std::pair<int, int> tmp = {loc.first + i.first, loc.second + i.second};;
+            if (inBounds(tmp, height, width)) {
                 result.indices[result.size] = tmp;
-                result.vals[result.size] = arr[tmp[0]][tmp[1]];
+                result.vals[result.size] = arrValue(arr, tmp);
                 result.size++;
             }
             cnt++;
@@ -215,4 +254,16 @@ Nbrs<T, V, N> nbrs(const std::vector<std::vector<V>> &arr, const std::array<int,
     return result;
 }
 
+template <typename T>
+auto pairToStr(const std::pair<T, T> &pair) -> std::string {
+    return std::to_string(pair.first) + "," + std::to_string(pair.second);
+}
 
+template <typename T>
+auto strToPair(std::string str) -> std::pair<T, T> {
+    std::stringstream ss(str);
+    T first, second;
+    char delimiter;
+    ss >> first >> delimiter >> second;
+    return std::make_pair(first, second);   
+}
