@@ -93,32 +93,41 @@ std::string tJoin(const T &arr) {
 
 template <typename T>
 std::vector<T> tSplit(const std::string &s, const char del = ',', bool is_int = false) {
-    vi result {};
+    std::vector<T> result;
     std::stringstream ss(s);
     std::string word;
-    while (!ss.eof()) {
-        std::getline(ss, word, del);
-        if (is_int) result.emplace_back(std::stoi(word));
-        else result.emplace_back(word);
-    }
-    return result;
-}
-
-template <typename T>
-std::vector<T> tSplit(const std::vector<std::string> &arr, const char del = ',', bool is_int = false) {
-    vi result {};
-
-    for (auto i: arr) {
-        std::stringstream ss(i);
-        std::string word;
-        while (!ss.eof()) {
-            std::getline(ss, word, del);
-            if (is_int) result.emplace_back(std::stoi(word));
-            else result.emplace_back(word);
+    while (std::getline(ss, word, del)) {
+        if (is_int) {
+            result.push_back(static_cast<T>(std::stoi(word)));
+        } else {
+            std::stringstream conv(word);
+            T temp;
+            if constexpr (std::is_same_v<T, std::string>) {
+                result.push_back(word);
+            } else {
+                conv >> temp;
+                result.push_back(temp);
+            }
         }
     }
     return result;
 }
+
+// template <typename T>
+// std::vector<T> tSplit(const std::vector<std::string> &arr, const char del = ',', bool is_int = false) {
+//     std::vector<T> result {};
+
+//     for (auto i: arr) {
+//         std::stringstream ss(i);
+//         std::string word;
+//         while (!ss.eof()) {
+//             std::getline(ss, word, del);
+//             if (is_int) result.emplace_back(std::stoi(word));
+//             else result.emplace_back(word);
+//         }
+//     }
+//     return result;
+// }
 
 template <typename T, std::size_t N>
 std::array<T, N> operator+(const std::array<T, N> &arr, const std::array<T, N> &arr2) {
@@ -205,3 +214,5 @@ Nbrs<T, V, N> nbrs(const std::vector<std::vector<V>> &arr, const std::array<int,
 
     return result;
 }
+
+
