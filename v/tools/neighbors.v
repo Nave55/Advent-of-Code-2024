@@ -8,29 +8,33 @@ pub fn add_arrs[T](arr []T, arr2 []T) []T {
 	return n
 }
 
-pub fn arr_value[T](arr [][]T, arr2 []int) T {
-	return arr[arr2[0]][arr2[1]]
+pub fn arr_value[T](arr [][]T, pos Vec2[int]) T {
+	return arr[pos.x][pos.y]
+}
+
+pub fn in_bounds(pos Vec2[int], height int, width int) bool {
+	return (pos.x >= 0 && pos.x < height && pos.y >= 0 && pos.y < width)
 }
 
 
-pub fn nbrs[T](arr [][]T, loc []int, t rune) ([][]int, []T) {
-	mut dir := [][]int{}
+pub fn nbrs[T](arr [][]T, loc Vec2[int], t rune) ([]Vec2[int], []T) {
+	mut dir := []Vec2[int]{}
     if t == `n` {
-		dir = [[-1, 0], [0, -1], [0, 1], [1, 0]]
+		dir = [Vec2[int]{-1, 0}, Vec2[int]{0, -1}, Vec2[int]{0, 1}, Vec2[int]{1, 0}]
 	}
 	else if t == `d` {
-		dir = [[-1, -1], [-1, 1], [1, -1], [1, 1]]
+		dir = [Vec2[int]{-1, -1}, Vec2[int]{-1, 1}, Vec2[int]{1, -1}, Vec2[int]{1, 1}]
 	} 
 	else if t== `b`  {
-		dir = [[-1, -1], [-1, 0], [-1, 1], [0, -1], [0, 1], [1, -1], [1, 0], [1, 1]]
+		dir = [Vec2[int]{-1, -1}, Vec2[int]{-1, 0}, Vec2[int]{-1, 1}, Vec2[int]{0, -1}, Vec2[int]{0, 1}, Vec2[int]{1, -1}, Vec2[int]{1, 0}, Vec2[int]{1, 1}]
 	}
-    mut indices := [][]int{}
+    mut indices := []Vec2[int]{}
     mut vals := []T{}
     for i in dir {
-        tmp := add_arrs(loc, i)
-        if tmp[0] != -1 && tmp[1] != -1 && tmp[0] != arr.len && tmp[1] != arr[0].len {
+        tmp := loc + i
+        if in_bounds(tmp, arr.len, arr[0].len) {
             indices << tmp
-            vals << arr_value(arr, tmp);
+            vals << arr_value[T](arr, tmp);
         }
     }
 	return indices, vals
