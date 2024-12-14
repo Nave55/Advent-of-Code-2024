@@ -8,11 +8,13 @@ import Math.*;
 using Lambda;
 using hx.strings.Strings;
 
+typedef Vec2 = {x: Int, y: Int};
 typedef AS =   Array<String>;
 typedef AI =   Array<Int>;
 typedef AA =   Array<Any>;
 typedef AC = Array<Char>;
 typedef AF =   Array<Float>;
+typedef AV2 = Array<Vec2>;
 typedef AI64 =  Array<Int64>;
 typedef ANI =  Array<Null<Int>>;
 typedef ANF =  Array<Null<Float>>;
@@ -33,7 +35,6 @@ typedef MIS =  Map<Int,    String>;
 typedef MSS =  Map<String, String>;
 typedef MI64 = Map<Int,    Int64>;
 typedef MS64 = Map<String, Int64>;
-typedef Vec2 = {x: Int, y: Int};
 
 /**
  * [Reverse Iterator]
@@ -221,20 +222,20 @@ inline function arrValue<T>(arr: Array<Array<T>>, arr2: AI) {
 @return A struct of AAI and AA
 */
 
-function nbrs<T>(arr: Array<Array<T>>, loc: AI, diag: String = "udlr") {
-    var dir: AAI = [];
-    var loc = new Vec(loc);
+function nbrs<T>(arr: Array<Array<T>>, loc: Vec2, diag: String = "udlr") {
+    var dir: Array<Vec2> = [];
+    var loc = new Tup(loc);
 
-    if (diag == "udlr") dir = [[-1, 0], [0, -1], [0, 1], [1, 0]];
-    if (diag == "diag") dir = [[-1, -1], [1, -1], [-1, 1], [1, 1]];
-    if (diag == "both") dir = [[-1, -1], [-1, 0], [-1, 1], [0, -1], [0, 1], [1, -1], [1, 0], [1, 1]];
-    var indices: AAI = [];
+    if (diag == "udlr") dir = [{x: -1, y: 0}, {x: 0, y: -1}, {x: 0, y: 1}, {x: 1, y: 0}];
+    if (diag == "diag") dir = [{x: -1, y: -1}, {x: 1, y: -1}, {x: -1, y: 1}, {x: 1, y: 1}];
+    if (diag == "both") dir = [{x: -1, y: -1}, {x: -1, y: 0}, {x:-1, y: 1}, {x: 0, y: -1}, {x: 0, y: 1}, {x: 1, y: -1}, {x: 1, y: 0}, {x: 1, y: 1}];
+    var indices: Array<Vec2> = [];
     var vals: Array<T> = [];
     for (i in dir) {
         var tmp = loc + i;
-        if (tmp[0] != -1 && tmp[1] != -1 && tmp[0] != arr.length && tmp[1] != arr[0].length) {
+        if (tmp.x != -1 && tmp.y != -1 && tmp.x != arr.length && tmp.y != arr[0].length) {
             indices.push(tmp);
-            vals.push(arrValue(arr, tmp));
+            vals.push(fetchVal(arr, tmp));
         }
     }
     return {indices: indices, vals: vals};
@@ -514,6 +515,15 @@ abstract Set<T>(Array<T>) {
             this.push(val);
         }
     } 
+
+    public inline function remove(val: T) {
+        if (this.contains(val)) this.remove(val);
+    }
+
+    public inline function contains(val: T): Bool {
+        if (this.contains(val)) return true;
+        return false;
+    }
 
     @:op(A & B)
     public function intersection(sec_set: Array<T>) {
