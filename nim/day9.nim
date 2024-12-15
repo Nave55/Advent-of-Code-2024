@@ -1,92 +1,97 @@
-import sequtils, strformat, strutils, sugar 
-type SI = seq[int]
+import sequtils, strutils, sugar, tables, algorithm, strformat
 
-proc readInput: SI  =
-    result = readFile("input/day9.txt")
-            .multiReplace({ "\r": "", "\n": "" })
-            .map(item => ord(item) - ord('0'))
+type
+  SI = seq[int]
+  HISI = Table[int, SI]
+  Info = object
+    top: int
+    m_spaces: int
+    size: int
 
-func diskMap(str: SI): (SI, SI) =
+proc readInput: SI =
+  result = readFile("input/day9.txt")
+          .multiReplace({ "\r": "", "\n": "" })
+          .map(item => ord(item) - ord('0'))
+
+proc diskMap(str: SI): (HISI, HISI, Info) =
+  result[0][-1] = @[]
   var tmp = -1
+  var contig = 0
   for ind, val in str:
+    let v = ind div 2
+    discard result[0].hasKeyOrPut(v, @[])
     for i in 0..<val:
       inc tmp
-      if ind %% 2 == 0:
-        if ind == 0: 
-          result[0] &= ind
-        else: 
-          result[0] &= int(ind / 2)
+      if ind mod 2 == 0:
+        result[0][v] &= tmp
       else:
-        result[1] &= tmp
+        result[0][-1].insert(tmp, 0)
+        inc contig
+    if ind mod 2 == 0 and val > 0:
+      if contig > 0:
+        let p = tmp - val - contig + 1
+        discard result[1].hasKeyOrPut(contig, @[])
+        result[1][contig].insert(p, 0)
+      contig = 0
+    elif val > 0:
+      result[2].m_spaces = max(result[2].m_spaces, val)
+    result[2].top = max(result[2].top, v)
+  result[2].size = tmp 
+  for i in 0..<result[2].m_spaces:
+    discard result[1].hasKeyOrPut(i, @[])
 
-func valLocs(arr: SI, v: int): SI =
-  var tmp = arr.find(v)
-  if tmp != -1:
-    result &= tmp
-    while tmp < arr.len() - 1:
-      tmp += 1
-      if arr[tmp] == v:
-        result &= tmp
-      else:
-        break
+proc orderDisk(p: HISI, info: Info): SI =
+  var pos = p
+  result = collect: 
+    for i in 0..info.size: -1
+  for i in 0..info.top:
+    for j in pos[i]:
+      result[j] = i
+  for i in countdown(result.len() - 1, 0):
+    if result[i] != -1 and pos[-1].len() > 0:
+      let popped = pos[-1].pop()
+      if popped < i:
+        result[i].swap(result[popped])
 
-func movePos(l, arr_pos: SI): SI =
-  result = @[l[0]]
-  block outer:
-    var ll = l
-    while ll.len() > 1:
-      for i in 1..<ll.len():
-        if result.len() >= arr_pos.len():
-          break outer
-        if ll[i] - ll[i - 1] == 1:
-          result &= ll[i]
-        else:
-          break
+proc orderDisk2(pos: HISI, e: HISI, info: Info): SI =
+  var empty = e
+  var n_pos = pos
+  for i in countdown(info.top, 1):
+    var l = pos[i].len()
+    var lowest = info.size
+    for j in l..info.top:
+      discard empty.hasKeyOrPut(j, @[])
+      if empty[j].len() > 0 and empty[j][^1] < lowest:
+        l = j
+        lowest = empty[j][^1]
+    if empty[l].len() == 0: continue
+    if empty.hasKey(l) and pos[i].len() > 0 and empty[l][^1] < pos[i][0]:
+      let popped = empty[l].pop()
+      let dif = l - n_pos[i].len()
+      var tmp = collect: 
+        for k in popped..<popped + l - dif: k
+      empty[dif] &= popped + l - dif
+      empty[dif].sort((a, b) => cmp(b, a))
+      n_pos[i] = tmp
 
-      if result.len() >= ll.len():
-        break
-      ll = ll[result.len()..^1]
-      result = @[ll[0]]
-  
-func orderDisk(d_map, locs: SI): SI =
-  result = d_map
-  for ind, val in locs:
-    if val < result.len():
-      result.insert(result.pop(), val)
+  result = collect: 
+    for i in 0..<info.size: -1
+  for i in 0..info.top:
+    if n_pos[i].len() > 0:
+      for j in n_pos[i]:
+        result[j] = i
 
-proc orderDisk2(arr, locs: SI): SI =
-  var l = locs
-  result = arr
-  
-  for i in l:
-    result.insert(-1, i)
-    
-  for v in countdown(arr[^1], 1):
-    let arr_pos = valLocs(result, v)   
-    if arr_pos.len() == 0: continue
-    let start = movePos(l, arr_pos)
-
-    if start.len() >= arr_pos.len():
-      if start[0] < arr_pos[^1]:
-        for i in arr_pos:
-          result[i] = -1
-        for i in start:
-          result[i] = v
-        
-      l = l.filterIt(it notin start)
-      # echo v, " ", start, " ", arr_pos, "\n"
-      
-func solution(o_disk: SI): int64 =
+func solution(o_disk: SI): int =
   for ind, val in o_disk:
     if val != -1:
       result += ind * val
 
-let 
+let
   s_seq = readInput()
-  (u_disk, locs) = diskMap(s_seq)
-  o_disk = orderDisk(u_disk, locs)
-  o_disk2 = orderDisk2(u_disk, locs)
-  pt1 = solution(o_disk)
+  (pos, empty, info) = diskMap(s_seq)
+  o_disk1 = orderDisk(pos, info)
+  o_disk2 = orderDisk2(pos, empty, info)
+  pt1 = solution(o_disk1)
   pt2 = solution(o_disk2)
 
 echo &"Part 1: {pt1}\nPart 2: {pt2}"
