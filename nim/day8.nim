@@ -60,7 +60,7 @@ func solution(mat: SSC, ants: HCSTI, slopes: HTSTI, width, height: int): int =
         ttl.incl(pos.tupToStr())
       if inBounds(neg, width, height) and fetchVal(mat, neg) != symb:
         ttl.incl(neg.tupToStr())
-
+        
   return ttl.len()
         
 func solution2(ants: HCSTI, slopes: HTSTI, width, height: int): int =
@@ -79,7 +79,7 @@ func solution2(ants: HCSTI, slopes: HTSTI, width, height: int): int =
       while true:
         val = val - i
         if inBounds(val, width, height):
-          ttl.incl(&"{val.x},{val.y}")
+          ttl.incl(val.tupToStr())
         else: 
           break
   return ttl.len()
