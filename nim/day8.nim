@@ -1,4 +1,4 @@
-import sequtils, strformat, Tables, Sets
+import sequtils, strformat, Tables, Sets, tools
 
 type 
     TI = tuple[x, y: int]
@@ -23,24 +23,6 @@ proc readInput(): (HCSTI, int, int, SSC) =
     result[1] = result[3][0].len()
     result[2] = result[3].len()
          
-func `+` (a, b: TI): TI =
-  return (a.x + b.x, a.y + b.y) 
-
-func `-` (a, b: TI): TI =
-  return (a.x - b.x, a.y - b.y)
-
-func `*`(a: TI, num: int): TI =
-  return (a.x * 2, a.y * 2) 
-
-func inBounds(tup: TI, width, height: int): bool =
-  return (tup.x >= 0 and tup.x < height) and (tup.y >= 0 and tup.y < width)  
-
-func fetchVal(mat: SSC, tup: TI): char =
-  return mat[tup.x][tup.y]
-
-func tupToStr(tup: TI): string =
-  return &"{tup.x},{tup.y}"
-
 func antSlopes(ants: HCSTI): HTSTI =
   for value in ants.values():
     for i in 0..<value.len() - 1:
