@@ -1,4 +1,4 @@
-import sequtils, strformat, Tables, Sets, tools
+import sequtils, strformat, tables, sets, tools
 
 type 
     TI = tuple[x, y: int]
