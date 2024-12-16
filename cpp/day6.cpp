@@ -102,8 +102,3 @@ auto solution2(vvc &mat, const pi &start, msi &locs, const std::unordered_set<st
     }
     return ttl;
 }
-
-
-
-
-
