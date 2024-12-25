@@ -86,7 +86,7 @@ auto solution2(vvc &mat, const pi &start, msi &locs, const std::unordered_set<st
                 facing++;
                 locs[n_pos_s]++;
                 if (locs[n_pos_s] == 4) {
-                    std::cout << "Obstacle was at pos" << i << std::endl;
+                    std::cout << "Obstacle was at pos " << i << "\n";
                     ttl++;
                     break;
                 }
