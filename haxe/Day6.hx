@@ -19,7 +19,6 @@ class Day6 {
         var start: AI = [];
         var locs: Map<String, Int> = [];  
 
-
         for (r_ind => r_val in con) {
             for (c_ind => c_val in r_val) {
                 if (c_val == "^") start = [r_ind, c_ind];
