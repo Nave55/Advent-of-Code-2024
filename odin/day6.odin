@@ -16,7 +16,6 @@ main :: proc() {
     context.allocator = arena_allocator
     defer vm.arena_destroy(&arena)
     
-
     dirs := map[int][2]int {
         0 = {-1, 0},
         1 = {0, 1},
