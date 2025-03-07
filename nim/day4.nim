@@ -48,7 +48,7 @@ proc checkX(matrix: SC): int =
                 valid &= @[r_ind, c_ind] 
     
     for i in valid:
-        let tmp = nbrs(matrix, @[i[0], i[1]], 'd')[1].join("")
+        let tmp = nbrs(matrix, (i[0], i[1]), 'd')[1].join("")
         if tmp in ["MMSS", "SSMM", "SMSM", "MSMS"]:
             inc result
 
