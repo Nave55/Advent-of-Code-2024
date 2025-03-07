@@ -1,7 +1,6 @@
 import sequtils, strformat, tools, tables, sets
 
 type 
-
     SSC = seq[seq[char]]
     TI = tuple[x, y: int]
     TSI = Table[TI, int]
