@@ -45,7 +45,6 @@ parse_file :: proc(filepath: string) -> (start: [2]int, locs: map[[2]int]int, ma
             tmp[col] = i
             if i == '^' do start = {row, col}
             if i == '#' do locs[{row, col}] = 0
-
         }
 
         mat[row] = tmp
