@@ -272,3 +272,12 @@ auto strToPair(std::string str) -> std::pair<T, T> {
     ss >> first >> delimiter >> second;
     return std::make_pair(first, second);   
 }
+
+struct pair_hash {
+    template <class T1, class T2>
+    std::size_t operator()(const std::pair<T1, T2>& pair) const {
+        std::size_t h1 = std::hash<T1>()(pair.first);
+        std::size_t h2 = std::hash<T2>()(pair.second);
+        return h1 ^ (h2 * 31); // Use a prime multiplier
+    }
+};
