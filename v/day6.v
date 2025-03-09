@@ -1,37 +1,36 @@
 import os
-import tools
+import tools as t
 import datatypes { Set }
+
+const rows := 130
+const cols := 130
 
 fn main() {
 	mut mat, mut empty, start := parse_file()!
-	height := mat.len - 1
-	width := mat[0].len - 1
 	dirs := {
-		0: [-1, 0]
-		1: [0, 1]
-		2: [1, 0]
-		3: [0, -1]
+		0: t.Vec2[int]{-1, 0}
+		1: t.Vec2[int]{0, 1}
+		2: t.Vec2[int]{1, 0}
+		3: t.Vec2[int]{0, -1}
 	}
-	pt1, mut visited := solution1(mat, start, width, height, dirs)
-	pt2 := solution2(mut mat, start, width, height, dirs, mut empty, mut visited)!
+
+	pt1, mut visited := solution1(mat, start, dirs)
+	pt2 := solution2(mut mat, start, dirs, mut empty, mut visited)!
 
 	println('Part 1: ${pt1}\nPart 2: ${pt2}')
 }
 
-fn parse_file() !([][]rune, map[string]int, []int) {
+fn parse_file() !([][]rune, map[string]int, t.Vec2[int]) {
 	lines := os.read_lines('input/day6.txt')!
 	mut locs := map[string]int{}
-	mut arr := [][]rune{}
-	mut start := []int{}
+	mut arr := [][]rune{len: 130, cap: 130, init: []rune{len: 130, cap: 130, init: `.`}}
+	mut start := t.Vec2[int]{}
 
-	for v in lines {
-		arr << v.runes()
-	}
-
-	for r_ind, r_val in arr {
+	for r_ind, r_val in lines {
 		for c_ind, c_val in r_val {
+			arr[r_ind][c_ind] = lines[r_ind][c_ind]
 			if c_val == `^` {
-				start = [r_ind, c_ind]
+				start = t.Vec2{r_ind, c_ind}
 			}
 			if c_val == `#` {
 				locs[r_ind.str() + ',' + c_ind.str()] = 0
@@ -42,65 +41,61 @@ fn parse_file() !([][]rune, map[string]int, []int) {
 	return arr, locs, start
 }
 
-fn solution1(mat [][]rune, start []int, width int, height int, dirs map[int][]int) (int, Set[string]) {
-	mut facing := 0
-	mut pos := start.clone()
-	mut visited := datatypes.Set[string]{}
+fn inbounds(pos t.Vec2[int]) bool {
+	return pos.x > 0 && pos.x < rows - 1 && pos.y > 0 && pos.y < cols - 1
+}
 
-	for pos[0] > 0  && pos[0] < height && pos[1] > 0 && pos[1] < width {
-		next_pos := tools.add_arrs(pos, dirs[facing])
-		if tools.arr_value(mat, next_pos) == `#` {
+fn solution1(mat [][]rune, start t.Vec2[int], dirs map[int]t.Vec2[int]) (int, Set[string]) {
+	mut facing := 0
+	mut pos := start
+	mut visited := Set[string]{}
+
+	for inbounds(pos) {
+		next_pos := pos + dirs[facing]
+		if t.arr_value(mat, next_pos) == `#` {
 			facing += 1
-			if facing == 4 {
-				facing = 0
-			}
+			facing = facing % 4
 		} else {
-			visited.add(pos[0].str() + ',' + pos[1].str())
-			pos[0] = next_pos[0]
-			pos[1] = next_pos[1]
+			visited.add(pos.to_str())
+			pos = next_pos
 		}
 	}
 
-	visited.add(pos[0].str() + ',' + pos[1].str())
+	visited.add(pos.to_str())
 
 	return visited.size(), visited
 }
 
-fn solution2(mut mat [][]rune, start []int, width int, height int, dirs map[int][]int, mut locs map[string]int, mut empty Set[string]) !int {
-	mut ttl := 0 
+fn solution2(mut mat [][]rune, start t.Vec2[int], dirs map[int]t.Vec2[int], mut locs map[string]int, mut empty Set[string]) !int {
+	mut ttl := 0
 	for !empty.is_empty() {
-		v := empty.pop() or { break }
-		v_pos := v.split(",").map(it.int())
+		v := string(empty.pop() or { break })
+		v_pos := t.str_to_vec2[int](v)
 		mut facing := 0
-		mut pos := start.clone()
-		mat[v_pos[0]][v_pos[1]] = `#`
+		mut pos := start
+		mat[v_pos.x][v_pos.y] = `#`
 		locs[v] = 0
 
-		for pos[0] > 0  && pos[0] < height && pos[1] > 0 && pos[1] < width {
-			next_pos := tools.add_arrs(pos, dirs[facing])
-			if tools.arr_value(mat, next_pos) == `#` {
-				str_pos :=next_pos[0].str() + "," + next_pos[1].str()
+		for inbounds(pos) {
+			next_pos := pos + dirs[facing]
+			if t.arr_value(mat, next_pos) == `#` {
+				str_pos := next_pos.to_str()
 				facing += 1
 				locs[str_pos] += 1
 				if locs[str_pos] == 4 {
-					println("Obstacle at ${v.split(',').map(it.int())}")
 					ttl++
 					break
-				}	
-				if facing == 4 {
-					facing = 0
 				}
+				facing = facing % 4
 			} else {
-				pos[0] = next_pos[0]
-				pos[1] = next_pos[1]
+				pos = next_pos
 			}
 		}
-		mat[v_pos[0]][v_pos[1]] = `.`
+		mat[v_pos.x][v_pos.y] = `.`
+		locs.delete(v)
 		for i in locs.keys() {
 			locs[i] = 0
 		}
-		locs.delete(v)
-
 	}
 
 	return ttl
