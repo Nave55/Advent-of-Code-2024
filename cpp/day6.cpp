@@ -5,25 +5,16 @@
 #include <unordered_set>
 #include <cassert>
 
-struct pair_hash {
-    template <class T1, class T2>
-    std::size_t operator()(const std::pair<T1, T2>& pair) const {
-        std::size_t h1 = std::hash<T1>()(pair.first);
-        std::size_t h2 = std::hash<T2>()(pair.second);
-        return h1 ^ (h2 * 31); // Use a prime multiplier
-    }
-};
-
 typedef std::pair<int, int> pi;
 typedef std::unordered_map<pi, int, pair_hash> mpi;
 typedef std::unordered_map<int, std::pair<int, int>> mipi;
 typedef std::unordered_set<std::pair<int, int>, pair_hash> spi;
 
+struct ParseFile {mpi locs; pi start;};
 constexpr int ROWS = 130;
 constexpr int COLS = 130;
-const mipi dirs {{0, {-1, 0}}, {1, {0, 1}}, {2, {1, 0}}, {3, {0, -1}}};
 char mat[ROWS][COLS] {{'.'}};
-struct ParseFile {mpi locs; pi start;};
+const mipi dirs {{0, {-1, 0}}, {1, {0, 1}}, {2, {1, 0}}, {3, {0, -1}}};
 
 auto parseFile() -> ParseFile;
 auto solution(pi) -> spi;
@@ -34,7 +25,7 @@ auto main() -> int {
     
     auto sol1 = solution(start);
     auto pt2 = solution2(start, locs, sol1);
-    printf("Part 1: %d\nPart 2: %d", (int)sol1.size(), pt2); 
+    printf("Part 1: %d\nPart 2: %d", (int) sol1.size(), pt2); 
 }
 
 auto parseFile() -> ParseFile {
