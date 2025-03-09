@@ -1,42 +1,43 @@
-import sequtils, strformat, tools, tables, sets
+import strformat, tools, tables, sets
 
 type 
-    SSC = seq[seq[char]]
+    AAC = array[130, array[130, char]]
     TI = tuple[x, y: int]
     TSI = Table[TI, int]
     HSI = HashSet[TI]
     
-proc readInput(): (SSC, TI, TSI) =
+proc readInput(): (AAC, TI, TSI) =
     let file = open("input/day6.txt");
-    defer: file.close()
+    defer: file.close()   
 
-    for i in file.lines():
-        result[0] &= i.toSeq()
-
-    for r_ind, r_val in result[0]:
-      for c_ind, c_val in r_val:
+    var r_ind = 0
+    for r_val in file.lines():
+      var c_ind = 0
+      for c_val in r_val:
+        result[0][r_ind][c_ind] = c_val
         if c_val == '^':
           result[1] = (r_ind, c_ind)
         if c_val == '#':
           result[2][(r_ind, c_ind)] = 0
-          
+        inc c_ind
+      inc r_ind 
+
 var (mat, start, locs) = readInput()
 let
   width = mat[0].len() - 1
   height = mat.len() - 1 
   dirs = {0: (-1, 0), 1: (0, 1), 2: (1, 0), 3: (0, -1)}.toTable
   
-proc pt1(mat: SSC, start: TI): (int, HSI) =
+proc pt1(mat: AAC, start: TI): (int, HSI) =
   var 
     facing = 0
     pos = start
   
   while (pos[0] in 1..<height) and (pos[1] in 1..<width):
     let next_pos = pos + dirs[facing] 
-    if fetchVal(mat, next_pos) == '#':
+    if mat[next_pos.x][next_pos.y] == '#':
       inc facing
-      if facing == 4:
-        facing = 0
+      facing = facing mod 4
     else:
       result[1].incl(pos)
       pos = next_pos
@@ -44,7 +45,7 @@ proc pt1(mat: SSC, start: TI): (int, HSI) =
   result[1].incl(pos)
   result[0] = result[1].len()
 
-proc pt2(mat: var SSC, start: TI, empty: HSI, locs: var TSI): int =
+proc pt2(mat: var AAC, start: TI, empty: HSI, locs: var TSI): int =
   for i in empty:
     var
       facing = 0
@@ -54,15 +55,13 @@ proc pt2(mat: var SSC, start: TI, empty: HSI, locs: var TSI): int =
       
     while (pos[0] in 1..<height) and (pos[1] in 1..<width):
       let next_pos = pos + dirs[facing]
-      if fetchVal(mat, next_pos) == '#':
+      if mat[next_pos.x][next_pos.y] == '#':
         inc facing 
         inc locs[next_pos]
         if locs[next_pos] == 5:
-          echo &"Obstacle was at pos: [{i.tupToStr()}]" 
           inc result
           break
-        if facing == 4:
-          facing = 0
+        facing = facing mod 4
       else:
         pos = next_pos
         
