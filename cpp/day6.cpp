@@ -1,104 +1,110 @@
 #include "tools.h"
-#include <tl/getlines.hpp>
-#include <tl/to.hpp>
 #include <iostream>
 #include <fstream>
 #include <unordered_map>
-#include <algorithm>
-#include <utility>
 #include <unordered_set>
 
+struct pair_hash {
+    template <class T1, class T2>
+    std::size_t operator()(const std::pair<T1, T2>& pair) const {
+        std::size_t h1 = std::hash<T1>()(pair.first);
+        std::size_t h2 = std::hash<T2>()(pair.second);
+        return h1 ^ (h2 * 31); // Use a prime multiplier
+    }
+};
+
 typedef std::pair<int, int> pi;
-typedef std::vector<pi> vpi;
-typedef std::unordered_map<std::string, int> msi;
+typedef std::unordered_map<pi, int, pair_hash> mpi;
+typedef std::unordered_map<int, std::pair<int, int>> mipi;
+typedef std::unordered_set<std::pair<int, int>, pair_hash> spi;
 
-struct ParseFile {vvc mat {}; msi locs {}; pi start {};};
-struct SortArr {vi vals; bool is_sorted;};
-const std::unordered_map<int, std::pair<int, int>> dirs {{0, {-1, 0}}, {1, {0, 1}}, {2, {1, 0}}, {3, {0, -1}}};
+struct ParseFile {mpi locs; pi start;};
+const mipi dirs {{0, {-1, 0}}, {1, {0, 1}}, {2, {1, 0}}, {3, {0, -1}}};
 
-
-auto parseFile() -> ParseFile;
-auto solution(const vvc &mat, pi pos) -> std::pair<int, std::unordered_set<std::string>>;
-auto solution2(vvc &mat, const pi &pos, msi &locs, const std::unordered_set<std::string> &empty) -> int;
+auto parseFile(char (&mat)[130][130]) -> ParseFile;
+auto solution(char (&mat)[130][130], pi pos) -> spi;
+auto solution2(char (&mat)[130][130], const pi &pos, mpi &locs, const spi &empty) -> int;
 
 auto main() -> int {
-    auto [mat, locs, start] = parseFile();
+    char mat[130][130] {{'.'}};
+    auto [locs, start] = parseFile(mat);
+    
     auto sol1 = solution(mat, start);
-    auto pt2 = solution2(mat, start, locs, sol1.second);
-    printf("Part 1: %d\nPart 2: %d", sol1.first, pt2); 
+    auto pt2 = solution2(mat, start, locs, sol1);
+    printf("Part 1: %d\nPart 2: %d", (int)sol1.size(), pt2); 
 }
 
-auto parseFile() -> ParseFile {
-    std::ifstream file ("input/day6.txt");
-    auto lines = tl::views::getlines(file) | tl::to<std::vector<std::string>>();
-
-    vvc mat {};
-    msi locs {};
+auto parseFile(char (&mat)[130][130]) -> ParseFile {
+    mpi locs;
     pi start;
-
-    for (size_t i {0}; i < lines.size(); ++i) {
-        vc tmp {};
-        for (size_t j {0}; j < lines[0].size(); ++j) {
+    
+    std::ifstream file ("input/day6.txt");;
+    std::string line;
+    size_t i {0};
+    while (std::getline(file, line)) {    
+        for (size_t j {0}; j < 130; ++j) {
+            if (line[j] == '#' || line[j] == '^') mat[i][j] = line[j];
             auto pair = std::make_pair(i, j);
-            if (lines[i][j] == '^') start = pair;
-            if (lines[i][j] == '#') locs[pairToStr(pair)] = 0;
-            tmp.push_back(lines[i][j]);
+            if (line[j] == '^') start = pair;
+            if (line[j] == '#') locs[pair] = 0;
         }
-        mat.emplace_back(tmp);
+        ++i;         
     }
-
-    return {mat, locs,start};
+    
+    return {locs, start};
 }
 
-auto solution(const vvc &mat, pi pos) -> std::pair<int, std::unordered_set<std::string>> {
+auto inbounds(const pi &pos) -> bool {
+    return ((pos.first > 0 && pos.first < 129) && (pos.second > 0 && pos.second < 129));
+}
+
+auto solution(char (&mat)[130][130], pi pos) -> spi {
     auto facing = 0;
-    std::unordered_set<std::string> visited;
-    while ((pos.first > 0 && static_cast<size_t>(pos.first) < mat.size() -1) && (pos.second > 0 && static_cast<size_t>(pos.second) < mat[0].size() - 1)) {
+    spi visited;
+    
+    while (inbounds(pos)) {
         auto n_pos = dirs.at(facing) + pos;
-        if (arrValue(mat, n_pos) == '#') {
+        if (mat[n_pos.first][n_pos.second] == '#') {
             facing++;
-            if (facing == 4) facing = 0;
-        }
-        else {
-            visited.emplace(pairToStr(pos));
+            facing = facing % 4;
+        } else {
+            visited.emplace(pos);
             pos = n_pos;
         }
     }
-    visited.emplace(pairToStr(pos));
-
-    return std::make_pair(static_cast<int>(visited.size()), visited);
+    visited.emplace(pos);
+    
+    return visited;
 }
 
-auto solution2(vvc &mat, const pi &start, msi &locs, const std::unordered_set<std::string> &empty) -> int {
+auto solution2(char (&mat)[130][130], const pi &start, mpi &locs, const spi &empty) -> int {
     auto ttl = 0;
 
-    for (auto i_val : empty) {
-        // std::cout << i_val << std::endl;
-        auto i = strToPair<int>(i_val);
+    for (auto &i : empty) {
         auto facing = 0;
         auto pos = start;
         mat[i.first][i.second] = '#';
-        locs[i_val] = 0;
-        while ((pos.first > 0 && static_cast<size_t>(pos.first) < mat.size() -1) && (pos.second > 0 && static_cast<size_t>(pos.second) < mat[0].size() - 1)) {
-            auto n_pos = dirs.at(facing) + pos;
-            auto n_pos_s = pairToStr(n_pos);
+        locs[i] = 0;
+
+        while (inbounds(pos)) {
+            auto n_pos = dirs.at(facing) + pos;;
             if (arrValue(mat, n_pos) == '#') {
                 facing++;
-                locs[n_pos_s]++;
-                if (locs[n_pos_s] == 4) {
-                    std::cout << "Obstacle was at pos " << i << "\n";
+                locs[n_pos]++;
+                if (locs[n_pos] == 4) {
+                    // std::cout << "Obstacle was at pos " << i << "\n";
                     ttl++;
                     break;
                 }
-                if (facing == 4) facing = 0;
+                facing = facing % 4;
             }
             else pos = n_pos;
         }
         mat[i.first][i.second] = '.';
+        locs.erase(i);   
         for (auto it = locs.begin(); it != locs.end(); ++it) {
             locs[it->first] = 0;
         }
-        locs.erase(i_val);   
     }
     return ttl;
 }
