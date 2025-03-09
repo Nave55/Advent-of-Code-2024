@@ -19,25 +19,25 @@ typedef std::unordered_map<pi, int, pair_hash> mpi;
 typedef std::unordered_map<int, std::pair<int, int>> mipi;
 typedef std::unordered_set<std::pair<int, int>, pair_hash> spi;
 
-struct ParseFile {mpi locs; pi start;};
-const mipi dirs {{0, {-1, 0}}, {1, {0, 1}}, {2, {1, 0}}, {3, {0, -1}}};
 constexpr int ROWS = 130;
 constexpr int COLS = 130;
+const mipi dirs {{0, {-1, 0}}, {1, {0, 1}}, {2, {1, 0}}, {3, {0, -1}}};
+char mat[ROWS][COLS] {{'.'}};
+struct ParseFile {mpi locs; pi start;};
 
-auto parseFile(char (&mat)[ROWS][COLS]) -> ParseFile;
-auto solution(char (&mat)[ROWS][COLS], pi pos) -> spi;
-auto solution2(char (&mat)[ROWS][COLS], const pi &pos, mpi &locs, const spi &empty) -> int;
+auto parseFile() -> ParseFile;
+auto solution(pi) -> spi;
+auto solution2(const pi&, mpi&, const spi&) -> int;
 
 auto main() -> int {
-    char mat[ROWS][COLS] {{'.'}};
-    auto [locs, start] = parseFile(mat);
+    auto [locs, start] = parseFile();
     
-    auto sol1 = solution(mat, start);
-    auto pt2 = solution2(mat, start, locs, sol1);
+    auto sol1 = solution(start);
+    auto pt2 = solution2(start, locs, sol1);
     printf("Part 1: %d\nPart 2: %d", (int)sol1.size(), pt2); 
 }
 
-auto parseFile(char (&mat)[ROWS][COLS]) -> ParseFile {
+auto parseFile() -> ParseFile {
     mpi locs;
     pi start;
     
@@ -59,10 +59,10 @@ auto parseFile(char (&mat)[ROWS][COLS]) -> ParseFile {
 }
 
 auto inbounds(const pi &pos) -> bool {
-    return ((pos.first > 0 && pos.first < 129) && (pos.second > 0 && pos.second < 129));
+    return ((pos.first > 0 && pos.first < ROWS - 1) && (pos.second > 0 && pos.second < COLS - 1));
 }
 
-auto solution(char (&mat)[ROWS][COLS], pi pos) -> spi {
+auto solution(pi pos) -> spi {
     auto facing = 0;
     spi visited;
     
@@ -81,7 +81,7 @@ auto solution(char (&mat)[ROWS][COLS], pi pos) -> spi {
     return visited;
 }
 
-auto solution2(char (&mat)[ROWS][COLS], const pi &start, mpi &locs, const spi &empty) -> int {
+auto solution2(const pi &start, mpi &locs, const spi &empty) -> int {
     auto ttl = 0;
 
     for (auto &i : empty) {
