@@ -20,6 +20,8 @@ typedef std::vector<std::vector<std::string>> vvs;
 typedef std::vector<char> vc;
 typedef std::vector<std::vector<char>> vvc;
 
+
+// Overload << for printing vectors
 template <typename T>
 std::ostream &operator<<(std::ostream &os, const std::vector<T> &arr) {
     os << "[";
@@ -33,6 +35,7 @@ std::ostream &operator<<(std::ostream &os, const std::vector<T> &arr) {
     return os;
 }
 
+// Overload << for printing vectors
 template <typename T, size_t N>
 std::ostream &operator<<(std::ostream &os, const std::array<T, N> &arr) {
     os << "[";
@@ -46,12 +49,18 @@ std::ostream &operator<<(std::ostream &os, const std::array<T, N> &arr) {
     return os;
 }
 
+// Overload << for printing pairs
 template <typename T>
 std::ostream &operator<<(std::ostream &os, const std::pair<T, T> &pair) {
     os << "[" << pair.first << ", " << pair.second << "]\n";
     return os;
 }
 
+/**
+ * @brief Calculates the average value of a vector
+ * @param arr The vector to calculate the average of
+ * @return The average value of the vector, or 0 if the vector is empty
+ */
 template <typename T>
 float avgVal(const std::vector<T> &arr) {
     if (arr.size() != 0)
@@ -59,6 +68,11 @@ float avgVal(const std::vector<T> &arr) {
     return 0;
 }
 
+/**
+ * @brief Returns the minimum value of a vector
+ * @param arr The vector to find the minimum of
+ * @return The minimum value of the vector, or 0 if the vector is empty
+ */
 template <typename T>
 T minVal(const std::vector<T> &arr) {
     if (arr.size() != 0) 
@@ -66,6 +80,11 @@ T minVal(const std::vector<T> &arr) {
     return 0;
 }
 
+/**
+ * @brief Returns the maximum value of a vector
+ * @param arr The vector to find the maximum of
+ * @return The maximum value of the vector, or 0 if the vector is empty
+ */
 template <typename T>
 T maxVal(const std::vector<T> &arr) {
     if (arr.size() != 0) 
@@ -73,6 +92,13 @@ T maxVal(const std::vector<T> &arr) {
     return 0;
 }
 
+/**
+ * @brief Joins all elements of a container together into a string
+ *        with a given delimiter
+ * @param arr The container to join
+ * @param delim The delimiter to insert between elements
+ * @return A string with all elements of arr joined together with delim
+ */
 template <typename T>
 std::string tJoin(const T &arr, const char delim) {
     std::string str {""};
@@ -86,6 +112,12 @@ std::string tJoin(const T &arr, const char delim) {
     return str;
 }
 
+/**
+ * @brief Joins all elements of a container together into a string
+ *        without a delimiter
+ * @param arr The container to join
+ * @return A string with all elements of arr joined together
+ */
 template <typename T>
 std::string tJoin(const T &arr) {
     std::string str {""};
@@ -97,6 +129,16 @@ std::string tJoin(const T &arr) {
     }
     return str;
 }
+
+/**
+ * @brief Splits a string into a vector of elements of type T based on a given delimiter.
+ * 
+ * @tparam T The type of elements in the returned vector.
+ * @param s The input string to be split.
+ * @param del The delimiter character to split the string on. Default is ','.
+ * @param is_int A boolean flag indicating whether the elements should be converted to integers. Default is false.
+ * @return A vector of elements of type T obtained by splitting the string s using the delimiter del.
+ */
 
 template <typename T>
 std::vector<T> tSplit(const std::string &s, const char del = ',', bool is_int = false) {
@@ -120,37 +162,51 @@ std::vector<T> tSplit(const std::string &s, const char del = ',', bool is_int = 
     return result;
 }
 
-// template <typename T>
-// std::vector<T> tSplit(const std::vector<std::string> &arr, const char del = ',', bool is_int = false) {
-//     std::vector<T> result {};
-
-//     for (auto i: arr) {
-//         std::stringstream ss(i);
-//         std::string word;
-//         while (!ss.eof()) {
-//             std::getline(ss, word, del);
-//             if (is_int) result.emplace_back(std::stoi(word));
-//             else result.emplace_back(word);
-//         }
-//     }
-//     return result;
-// }
+/**
+ * @brief Element-wise addition of two pairs
+ *
+ * @param arr The first pair to add
+ * @param arr2 The second pair to add
+ * @return A new pair with elements that are the sum of the corresponding elements of arr and arr2
+ */
 
 template <typename T>
 std::pair<T, T> operator+(const std::pair<T, T> &arr, const std::pair<T, T> &arr2) {
     return {arr.first + arr2.first, arr.second + arr2.second};
 }
 
+/**
+ * @brief Element-wise subtraction of two pairs
+ *
+ * @param arr The first pair to subtract from
+ * @param arr2 The second pair to subtract
+ * @return A new pair with elements that are the difference of the corresponding elements of arr and arr2
+ */
+
 template <typename T>
 std::pair<T, T> operator-(const std::pair<T, T> &arr, const std::pair<T, T> &arr2) {
     return {arr.first - arr2.first, arr.second - arr2.second};
 }
 
+/**
+ * @brief Element-wise multiplication of a pair by a scalar
+ *
+ * @param arr The pair to multiply
+ * @param scalar The scalar to multiply by
+ * @return A new pair with elements that are the product of the corresponding elements of arr and scalar
+ */
 template <typename T>
 std::pair<T, T> operator*(const std::pair<T, T> &arr, T scalar) {
     return {arr.first * scalar, arr.second * scalar};
 }
 
+/**
+ * @brief Element-wise addition of two arrays
+ *
+ * @param arr The first array to add
+ * @param arr2 The second array to add
+ * @return A new array with elements that are the sum of the corresponding elements of arr and arr2
+ */
 template <typename T, std::size_t N>
 std::array<T, N> operator+(const std::array<T, N> &arr, const std::array<T, N> &arr2) {
     std::array<T, N> result {};
@@ -159,6 +215,14 @@ std::array<T, N> operator+(const std::array<T, N> &arr, const std::array<T, N> &
     }
     return result;
 }
+
+/**
+ * @brief Element-wise addition of an array and a vector
+ *
+ * @param arr The array to add
+ * @param arr2 The vector to add
+ * @return A new array with elements that are the sum of the corresponding elements of arr and arr2
+ */
 
 template <typename T, std::size_t N>
 std::array<T, N> operator+(const std::array<T, N> &arr, const std::vector<T> &arr2) {
@@ -169,6 +233,13 @@ std::array<T, N> operator+(const std::array<T, N> &arr, const std::vector<T> &ar
     return result;
 }
 
+/**
+ * @brief Element-wise addition of two vectors
+ *
+ * @param arr The first vector to add
+ * @param arr2 The second vector to add
+ * @return A new vector with elements that are the sum of the corresponding elements of arr and arr2
+ */
 template <typename T>
 std::vector<T> operator+(const std::vector<T> &arr, const std::vector<T> &arr2) {
     std::vector<T> result {};
@@ -178,6 +249,13 @@ std::vector<T> operator+(const std::vector<T> &arr, const std::vector<T> &arr2) 
     return result;
 }
 
+/**
+ * @brief Retrieves the value from a 2D vector at a specified location
+ * @param arr The 2D vector from which to retrieve the value
+ * @param arr2 An array containing the row and column indices for the desired value
+ * @return The value at the specified location in the 2D vector
+ */
+
 template <typename T>
 T arrValue(const std::vector<std::vector<T>> &arr, const std::array<int, 2> &arr2) {
     return arr[arr2[0]][arr2[1]];
@@ -185,9 +263,23 @@ T arrValue(const std::vector<std::vector<T>> &arr, const std::array<int, 2> &arr
 
 template <typename T>
 T arrValue(const std::vector<std::vector<T>> &arr, const std::pair<int, int> &arr2) {
+/**
+ * @brief Retrieves the value from a 2D vector at a specified row and column index
+ * @param arr The 2D vector from which to retrieve the value
+ * @param arr2 A pair representing the row and column indices
+ * @return The value at the specified row and column index in the 2D vector
+ */
+
     return arr[arr2.first][arr2.second];
 }
 
+/**
+ * @brief Retrieves the value from a 2D array at a specified row and column index
+ *
+ * @param arr The 2D array from which to retrieve the value
+ * @param arr2 A pair representing the row and column indices
+ * @return The value at the specified row and column index in the 2D array
+ */
 template <typename T, size_t N, size_t M>
 T arrValue(const T (&arr)[N][M], const std::pair<int, int> &arr2) {
     return arr[arr2.first][arr2.second];
@@ -195,8 +287,22 @@ T arrValue(const T (&arr)[N][M], const std::pair<int, int> &arr2) {
 
 template <typename T>
 bool inBounds(const std::vector<std::vector<T>> &arr, const std::pair<int, int> &pos) {
+/**
+ * @brief Checks if a given pair of indices is within the bounds of a 2D vector
+ * @param arr The 2D vector to check against
+ * @param pos The pair of indices to check
+ * @return true if the indices are within the bounds of the vector, false otherwise
+ */
     return (pos.first >= 0 && pos.second >= 0 && static_cast<size_t>(pos.first) < arr.size() && static_cast<size_t>(pos.second) < arr[0].size());    
 }
+
+/**
+ * @brief Checks if a given pair of indices is within the bounds of a 2D array
+ * @param pos The pair of indices to check
+ * @param height The height of the 2D array
+ * @param width The width of the 2D array
+ * @return true if the indices are within the bounds of the array, false otherwise
+ */
 
 bool inBounds(const std::pair<int, int> &pos, size_t height, size_t width) {
     return (pos.first >= 0 && pos.second >= 0 && static_cast<size_t>(pos.first) < height && static_cast<size_t>(pos.second) < width);   
@@ -209,6 +315,14 @@ struct Nbrs {
     std::size_t size = 0; // To keep track of actual filled elements
 };
 
+/**
+ * @brief Finds the neighbors of a given location in a 2D vector
+ *
+ * @param arr The 2D vector to search for neighbors
+ * @param loc The location to search for neighbors
+ * @param type The type of neighbors to search for. 'n' for non-diagonal neighbors, 'd' for diagonal neighbors, 'a' for all neighbors
+ * @return A struct containing the indices and values of the neighbors
+ */
 template <typename V, std::size_t N>
 Nbrs<V, N> nbrs(const std::vector<std::vector<V>> &arr, const std::pair<int, int> &loc, char type = 'n') {
     auto height = arr.size();
@@ -259,6 +373,11 @@ Nbrs<V, N> nbrs(const std::vector<std::vector<V>> &arr, const std::pair<int, int
     return result;
 }
 
+/**
+ * @brief Converts a pair of type T to a string in the format "first,second"
+ * @param pair The pair to convert
+ * @return A string representing the pair
+ */
 template <typename T>
 auto pairToStr(const std::pair<T, T> &pair) -> std::string {
     return std::to_string(pair.first) + "," + std::to_string(pair.second);
@@ -266,6 +385,14 @@ auto pairToStr(const std::pair<T, T> &pair) -> std::string {
 
 template <typename T>
 auto strToPair(std::string str) -> std::pair<T, T> {
+/**
+ * @brief Converts a string representation of a pair to a std::pair of type T
+ *
+ * @tparam T The type of elements in the returned pair
+ * @param str The string containing the pair, formatted as "first,second"
+ * @return A std::pair with the elements parsed from the string
+ */
+
     std::stringstream ss(str);
     T first, second;
     char delimiter;
@@ -274,8 +401,21 @@ auto strToPair(std::string str) -> std::pair<T, T> {
 }
 
 struct pair_hash {
+/**
+ * @brief Hash function for a pair of elements
+ *
+ * @tparam T1 The type of the first element in the pair
+ * @tparam T2 The type of the second element in the pair
+ * @param pair The pair to hash
+ * @return A std::size_t representing the hash of the pair
+ *
+ * This function computes a hash value for a given std::pair by combining the 
+ * hash values of its elements. It uses XOR and a prime multiplier to 
+ * reduce the likelihood of hash collisions.
+ */
+
     template <class T1, class T2>
-    std::size_t operator()(const std::pair<T1, T2>& pair) const {
+    std::size_t operator()(const std::pair<T1, T2> &pair) const {
         std::size_t h1 = std::hash<T1>()(pair.first);
         std::size_t h2 = std::hash<T2>()(pair.second);
         return h1 ^ (h2 * 31); // Use a prime multiplier
