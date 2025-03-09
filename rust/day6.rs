@@ -7,6 +7,9 @@ type MITI = HashMap<i32, TI>;
 type MTII = HashMap<TI, i32>;
 type Mat = [[char; 130]; 130];
 
+static ROWS: usize = 130;
+static COLS: usize = 130;
+
 fn main() {
     let dirs: MITI = [(0, (-1, 0)), (1, (0, 1)), (2, (1, 0)), (3, (0, -1))].into();
     let (pos, mat, locs) = parse_file();
@@ -19,19 +22,19 @@ fn parse_file() -> (TI, Mat, MTII) {
     let con = read_to_string("../inputs/day6.txt").unwrap();
 
     let mut start: TI = (0, 0);
-    let mut mat: Mat = [['.'; 130]; 130];
+    let mut mat: Mat = [['.'; ROWS]; COLS];
     let mut locs: MTII = HashMap::new();
 
-    for (r_ind, row) in con.split("\r\n").enumerate() {
-        for (c_ind, col) in row.chars().enumerate() {
+    con.split("\r\n").enumerate().for_each(|(r_ind, row)| {
+        row.chars().enumerate().for_each(|(c_ind, col)| {
             mat[r_ind][c_ind] = col;
             if col == '#' {
                 locs.insert((r_ind as i32, c_ind as i32), 0);
             } else if col == '^' {
                 start = (r_ind as i32, c_ind as i32);
             }
-        }
-    }
+        })
+    });
 
     return (start, mat, locs);
 }
@@ -44,11 +47,8 @@ fn add_tups(x: TI, y: TI) -> TI {
     (x.0 + y.0, x.1 + y.1)
 }
 
-fn is_within_bounds(pos: TI, mat: &Mat) -> bool {
-    pos.0 > 0
-        && (pos.0 as usize) < mat.len() - 1
-        && pos.1 > 0
-        && (pos.1 as usize) < mat[0].len() - 1
+fn is_within_bounds(pos: TI) -> bool {
+    pos.0 > 0 && (pos.0 as usize) < ROWS - 1 && pos.1 > 0 && (pos.1 as usize) < COLS - 1
 }
 
 fn solution(pos: &TI, mat: &Mat, dirs: &MITI) -> STI {
@@ -56,7 +56,7 @@ fn solution(pos: &TI, mat: &Mat, dirs: &MITI) -> STI {
     let mut pos = *pos;
     let mut visited: STI = HashSet::new();
 
-    while is_within_bounds(pos, mat) {
+    while is_within_bounds(pos) {
         let next_pos = add_tups(pos, dirs[&facing]);
         if arr_value(mat, &next_pos) == '#' {
             facing += 1;
@@ -82,7 +82,7 @@ fn solution2(pos: &TI, mat: &Mat, locs: &MTII, dirs: &MITI, empty: &STI) -> i32 
         mat[i.0 as usize][i.1 as usize] = '#';
         locs.insert(*i, 0);
 
-        while is_within_bounds(pos, &mat) {
+        while is_within_bounds(pos) {
             let next_pos = add_tups(pos, dirs[&facing]);
             if arr_value(&mat, &next_pos) == '#' {
                 facing += 1;
