@@ -3,6 +3,7 @@
 #include <fstream>
 #include <unordered_map>
 #include <unordered_set>
+#include <cassert>
 
 struct pair_hash {
     template <class T1, class T2>
@@ -20,13 +21,15 @@ typedef std::unordered_set<std::pair<int, int>, pair_hash> spi;
 
 struct ParseFile {mpi locs; pi start;};
 const mipi dirs {{0, {-1, 0}}, {1, {0, 1}}, {2, {1, 0}}, {3, {0, -1}}};
+constexpr int ROWS = 130;
+constexpr int COLS = 130;
 
-auto parseFile(char (&mat)[130][130]) -> ParseFile;
-auto solution(char (&mat)[130][130], pi pos) -> spi;
-auto solution2(char (&mat)[130][130], const pi &pos, mpi &locs, const spi &empty) -> int;
+auto parseFile(char (&mat)[ROWS][COLS]) -> ParseFile;
+auto solution(char (&mat)[ROWS][COLS], pi pos) -> spi;
+auto solution2(char (&mat)[ROWS][COLS], const pi &pos, mpi &locs, const spi &empty) -> int;
 
 auto main() -> int {
-    char mat[130][130] {{'.'}};
+    char mat[ROWS][COLS] {{'.'}};
     auto [locs, start] = parseFile(mat);
     
     auto sol1 = solution(mat, start);
@@ -34,15 +37,16 @@ auto main() -> int {
     printf("Part 1: %d\nPart 2: %d", (int)sol1.size(), pt2); 
 }
 
-auto parseFile(char (&mat)[130][130]) -> ParseFile {
+auto parseFile(char (&mat)[ROWS][COLS]) -> ParseFile {
     mpi locs;
     pi start;
     
-    std::ifstream file ("input/day6.txt");;
+    std::ifstream file ("input/day6.txt");
+    assert(file);
     std::string line;
     size_t i {0};
     while (std::getline(file, line)) {    
-        for (size_t j {0}; j < 130; ++j) {
+        for (size_t j {0}; j < ROWS; ++j) {
             if (line[j] == '#' || line[j] == '^') mat[i][j] = line[j];
             auto pair = std::make_pair(i, j);
             if (line[j] == '^') start = pair;
@@ -58,7 +62,7 @@ auto inbounds(const pi &pos) -> bool {
     return ((pos.first > 0 && pos.first < 129) && (pos.second > 0 && pos.second < 129));
 }
 
-auto solution(char (&mat)[130][130], pi pos) -> spi {
+auto solution(char (&mat)[ROWS][COLS], pi pos) -> spi {
     auto facing = 0;
     spi visited;
     
@@ -77,7 +81,7 @@ auto solution(char (&mat)[130][130], pi pos) -> spi {
     return visited;
 }
 
-auto solution2(char (&mat)[130][130], const pi &start, mpi &locs, const spi &empty) -> int {
+auto solution2(char (&mat)[ROWS][COLS], const pi &start, mpi &locs, const spi &empty) -> int {
     auto ttl = 0;
 
     for (auto &i : empty) {
