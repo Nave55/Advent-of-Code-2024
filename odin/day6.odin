@@ -8,9 +8,12 @@ import "core:mem"
 import vm "core:mem/virtual"
 import "../Tools"
 
+ROWS :: 130
+COLS :: 130
+
 main :: proc() {
     arena: vm.Arena
-    err := vm.arena_init_growing(&arena, 5 * mem.Megabyte)
+    err := vm.arena_init_growing(&arena, 1 * mem.Megabyte)
     assert(err == .None)
     arena_allocator := vm.arena_allocator(&arena)
     context.allocator = arena_allocator
@@ -31,41 +34,47 @@ main :: proc() {
 }
 
 @require_results
-parse_file :: proc(filepath: string) -> (start: [2]int, locs: map[[2]int]int, mat: [130][130]rune) {
+parse_file :: proc(filepath: string) -> (start: [2]int, locs: map[[2]int]int, mat: [COLS][ROWS]rune) {
 	data, ok := os.read_entire_file(filepath)
 	if !ok do return
 	defer delete(data)
 	
 	it := string(data)
 	
-    row := 0
+    r_ind := 0
 	for line in strings.split_lines_iterator(&it) {
-        tmp: [130]rune
-        for i, col in line {
-            tmp[col] = i
-            if i == '^' do start = {row, col}
-            if i == '#' do locs[{row, col}] = 0
+        for col, c_ind in line {
+            mat[r_ind][c_ind] = rune(col)
+            if col == '^' do start = {r_ind, c_ind}
+            if col == '#' do locs[{r_ind, c_ind}] = 0
         }
-
-        mat[row] = tmp
-        row += 1
+        r_ind += 1
     }
 
     return
 }
 
+inbounds :: proc(pos: [2]int) -> bool {
+    return (pos.x > 0 && pos.x < ROWS -1 && pos.y > 0 && pos.y < COLS- 1)
+}
+
 @require_results
-solution :: proc(pos: [2]int, locs: map[[2]int]int, dirs: map[int][2]int, mat: ^[130][130]rune) -> (visited: map[[2]int]struct{}) {
+solution :: proc(
+    pos: [2]int, 
+    locs: map[[2]int]int, 
+    dirs: map[int][2]int, 
+    mat: ^[ROWS][COLS]rune
+) -> (visited: map[[2]int]struct{}) {
+    
     facing := 0
     pos := pos
 
-    for ((pos[0] > 0 && pos[0] < len(mat) -1) && pos[1] > 0 && pos[1] < len(mat[0])- 1) {
+    for inbounds(pos) {
         next_pos := pos + dirs[facing]
         if Tools.arrValue(mat, next_pos, rune) == '#' {
             facing += 1
-            if facing == 4 do facing = 0
-        }
-        else {
+            facing = facing %% 4
+        } else {
             visited[{pos[0], pos[1]}] = {}
             pos = next_pos
         }
@@ -76,7 +85,14 @@ solution :: proc(pos: [2]int, locs: map[[2]int]int, dirs: map[int][2]int, mat: ^
 }
 
 @require_results
-solution2 :: proc(pos: [2]int, locs: map[[2]int]int, dirs: map[int][2]int, mat: ^[130][130]rune, empty: map[[2]int]struct{}) -> (ttl := 0) {
+solution2 :: proc(
+    pos: [2]int, 
+    locs: map[[2]int]int, 
+    dirs: map[int][2]int, 
+    mat: ^[ROWS][COLS]rune, 
+    empty: map[[2]int]struct{}
+) -> (ttl := 0) {
+
     locs := locs
     for i in empty {
         facing := 0
@@ -84,23 +100,22 @@ solution2 :: proc(pos: [2]int, locs: map[[2]int]int, dirs: map[int][2]int, mat: 
         mat[i[0]][i[1]] = '#'
         locs[i] = 0   
 
-        for ((pos[0] > 0 && pos[0] < len(mat) -1) && pos[1] > 0 && pos[1] < len(mat[0])- 1) {
+        for inbounds(pos) {
             next_pos := pos + dirs[facing]
             if Tools.arrValue(mat, next_pos, rune)  == '#' {
                 facing += 1
                 locs[next_pos] += 1
                 if locs[next_pos] == 4 {
-                    fmt.printfln("Obstacle was at pos [%v, %v]", i[0], i[1])
                     ttl += 1
                     break
                 }
-                if facing == 4 do facing = 0
-            }
+                facing = facing %% 4
+            } 
             else do pos = next_pos
         }
         mat[i[0]][i[1]] = '.'
-        for key in locs do locs[key] = 0
         delete_key(&locs, i)
+        for key in locs do locs[key] = 0
     }
 
     return
