@@ -35,7 +35,7 @@ std::ostream &operator<<(std::ostream &os, const std::vector<T> &arr) {
     return os;
 }
 
-// Overload << for printing vectors
+// Overload << for printing arrays
 template <typename T, size_t N>
 std::ostream &operator<<(std::ostream &os, const std::array<T, N> &arr) {
     os << "[";
