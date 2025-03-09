@@ -27,7 +27,7 @@ struct ParseFile {mpi locs; pi start;};
 
 auto parseFile() -> ParseFile;
 auto solution(pi) -> spi;
-auto solution2(const pi&, mpi&, const spi&) -> int;
+auto solution2(const pi&, const mpi&, const spi&) -> int;
 
 auto main() -> int {
     auto [locs, start] = parseFile();
@@ -81,8 +81,9 @@ auto solution(pi pos) -> spi {
     return visited;
 }
 
-auto solution2(const pi &start, mpi &locs, const spi &empty) -> int {
+auto solution2(const pi &start, const mpi &loc, const spi &empty) -> int {
     auto ttl = 0;
+    auto locs = loc;
 
     for (auto &i : empty) {
         auto facing = 0;
@@ -105,10 +106,7 @@ auto solution2(const pi &start, mpi &locs, const spi &empty) -> int {
             else pos = n_pos;
         }
         mat[i.first][i.second] = '.';
-        locs.erase(i);   
-        for (auto it = locs.begin(); it != locs.end(); ++it) {
-            locs[it->first] = 0;
-        }
+        locs = loc;
     }
     return ttl;
 }
