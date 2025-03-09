@@ -188,6 +188,11 @@ T arrValue(const std::vector<std::vector<T>> &arr, const std::pair<int, int> &ar
     return arr[arr2.first][arr2.second];
 }
 
+template <typename T, size_t N, size_t M>
+T arrValue(const T (&arr)[N][M], const std::pair<int, int> &arr2) {
+    return arr[arr2.first][arr2.second];
+}
+
 template <typename T>
 bool inBounds(const std::vector<std::vector<T>> &arr, const std::pair<int, int> &pos) {
     return (pos.first >= 0 && pos.second >= 0 && static_cast<size_t>(pos.first) < arr.size() && static_cast<size_t>(pos.second) < arr[0].size());    
@@ -199,8 +204,8 @@ bool inBounds(const std::pair<int, int> &pos, size_t height, size_t width) {
 
 template <typename V, std::size_t N>
 struct Nbrs {
-    std::array<std::pair<int, int>, N> indices {};
-    std::array<V, N> vals {};
+    std::array<std::pair<int, int>, N> indices;
+    std::array<V, N> vals;
     std::size_t size = 0; // To keep track of actual filled elements
 };
 
