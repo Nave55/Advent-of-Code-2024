@@ -27,7 +27,7 @@ parse_file :: proc(filepath: string) -> (targets: [dynamic]int, nums: [dynamic]s
 	data, ok := os.read_entire_file(filepath)
 	if !ok do return
 	defer delete(data)
-    defer free_all(context.temp_allocator)
+    	defer free_all(context.temp_allocator)
 	
 	it := string(data)
 	
