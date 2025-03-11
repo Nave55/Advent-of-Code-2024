@@ -4,9 +4,7 @@ import "core:text/regex"
 import "core:unicode/utf8"
 
 arrValue :: proc(arr: ^$T, arr2: [2]int, $R: typeid) -> R {
-	when R == rune do return rune(arr[arr2.x][arr2.y])
-	when R != rune do return arr[arr2.x][arr2.y]
-	return 0
+	return R(arr[arr2.x][arr2.y])
 }
 
 nbrs :: proc(
@@ -49,3 +47,6 @@ regexFind :: proc(str, pattern: string, slide: int = 1) -> (arr: [dynamic]regex.
 	return
 }
 
+inBounds :: proc(pos: [2]$T, width, height: T) -> bool {
+	return (pos.x >= 0 && pos.x < height && pos.y >= 0 && pos.y < width)
+}
