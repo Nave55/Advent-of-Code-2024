@@ -27,7 +27,7 @@ fn parse_file() ([][]rune, map[rune][]t.Vec2[int], int, int)  {
 		}
 	}
 	
-	width := int(arr[].len)
+	width := int(arr[0].len)
 	height := int(arr.len)
 
 	return arr, mp, width, height
@@ -49,6 +49,7 @@ fn ant_slopes(ants map[rune][]t.Vec2[int]) map[string][]t.Vec2[int] {
 
 fn solution(mat [][]rune, ants map[rune][]t.Vec2[int], slopes map[string][]t.Vec2[int], width int, height int) int {
 	mut ttl := dt.Set[string]{}
+
 	for key, value in slopes {
 		for i in value {
 			vec := t.str_to_vec2[int](key)
@@ -64,11 +65,13 @@ fn solution(mat [][]rune, ants map[rune][]t.Vec2[int], slopes map[string][]t.Vec
 			}
 		}
 	}
+
 	return ttl.size()
 }
 
 fn solution2(ants map[rune][]t.Vec2[int], slopes map[string][]t.Vec2[int], width int, height int) int {
 	mut ttl := dt.Set[string]{};
+
 	for key, value in slopes {
 		ttl.add(key)
 		for i in value {
