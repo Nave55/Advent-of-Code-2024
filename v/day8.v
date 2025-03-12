@@ -2,35 +2,34 @@ import os
 import tools as t
 import datatypes as dt
 
+const width := 50
+const height := 50
+
 fn main() {
-	mat, mp, width, height := parse_file()
+	mat, mp := parse_file()
 	slopes := ant_slopes(mp)
-	pt1 := solution(mat, mp, slopes, width, height)
-	pt2 := solution2(mp, slopes, width, height)
+	pt1 := solution(mat, mp, slopes)
+	pt2 := solution2(mp, slopes)
 	println('Part 1: ${pt1}\nPart 2: ${pt2}')
 }
 
-fn parse_file() ([][]rune, map[rune][]t.Vec2[int], int, int)  {
+fn parse_file() ([][]rune, map[rune][]t.Vec2[int])  {
 	lines := os.read_lines('input/day8.txt') or { panic(err) }
-	mut arr := [][]rune{}
+	mut arr := [][]rune{len: height, cap: height, init: []rune{len: width, cap: width, init: `.`}}
 	mut mp := map[rune][]t.Vec2[int]{}
 
-	for i in lines {
-		arr << i.runes()
-	}
-
-	for r_ind, r_val in arr {
+	mut r_ind := 0
+	for r_val in lines {
 		for c_ind, c_val in r_val {
+			arr[r_ind][c_ind] = c_val
 			if c_val != `.` {
 				mp[c_val] << t.Vec2[int]{r_ind, c_ind}
 			}
 		}
+		r_ind++
 	}
 	
-	width := int(arr[0].len)
-	height := int(arr.len)
-
-	return arr, mp, width, height
+	return arr, mp
 }
 
 fn ant_slopes(ants map[rune][]t.Vec2[int]) map[string][]t.Vec2[int] {
@@ -47,7 +46,7 @@ fn ant_slopes(ants map[rune][]t.Vec2[int]) map[string][]t.Vec2[int] {
 	return slopes
 }
 
-fn solution(mat [][]rune, ants map[rune][]t.Vec2[int], slopes map[string][]t.Vec2[int], width int, height int) int {
+fn solution(mat [][]rune, ants map[rune][]t.Vec2[int], slopes map[string][]t.Vec2[int]) int {
 	mut ttl := dt.Set[string]{}
 
 	for key, value in slopes {
@@ -69,7 +68,7 @@ fn solution(mat [][]rune, ants map[rune][]t.Vec2[int], slopes map[string][]t.Vec
 	return ttl.size()
 }
 
-fn solution2(ants map[rune][]t.Vec2[int], slopes map[string][]t.Vec2[int], width int, height int) int {
+fn solution2(ants map[rune][]t.Vec2[int], slopes map[string][]t.Vec2[int]) int {
 	mut ttl := dt.Set[string]{};
 
 	for key, value in slopes {
