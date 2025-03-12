@@ -9,9 +9,9 @@ proc readInput(): (SI, SSI) =
     defer: file.close()
 
     for i in file.lines():
-      var tmp = i.replace(" ", ",").split(":,")
+      let tmp = i.split(": ")
       result[0] &= tmp[0].parseInt()
-      result[1] &= tmp[1].split(",").map(item => item.parseInt())
+      result[1] &= tmp[1].split(" ").map(item => item.parseInt())
 
 func concat(a, b: int): int =
   parseInt($a & $b)
