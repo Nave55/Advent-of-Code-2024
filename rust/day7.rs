@@ -1,5 +1,3 @@
-use std::fs::read_to_string;
-
 type VI = Vec<i64>;
 type VVI = Vec<VI>;
 
@@ -10,19 +8,21 @@ fn main() {
 }
 
 fn parse_file() -> (VVI, VI) {
-    let con = read_to_string("../inputs/day7.txt").expect("Failed to read");
-    let mut nums: VVI = Vec::new();
-    let mut targets: VI = Vec::new();
+    let content = std::fs::read_to_string("../inputs/day7.txt").expect("Failed to open file");
 
-    con.lines().for_each(|i| {
-        let tmp = i
-            .split(": ")
-            .flat_map(|line| line.split(" ").map(|item| item.parse::<i64>().unwrap()))
-            .collect::<VI>();
+    let (nums, targets): (VVI, VI) = content
+        .lines()
+        .map(|line| {
+            let mut items = line.split(": ").flat_map(|part| {
+                part.split_whitespace()
+                    .map(|item| item.parse::<i64>().unwrap())
+            });
 
-        targets.push(tmp[0]);
-        nums.push(tmp[1..].to_vec())
-    });
+            let target = items.next().unwrap();
+            let numbers = items.collect();
+            (numbers, target)
+        })
+        .unzip();
 
     (nums, targets)
 }
