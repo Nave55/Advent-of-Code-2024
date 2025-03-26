@@ -10,6 +10,7 @@
 #include <memory>
 #include <math.h>
 #include <utility>
+#include <fstream>
 
 typedef std::vector<int> vi;
 typedef std::vector<std::vector<int>> vvi;
@@ -35,7 +36,7 @@ std::ostream &operator<<(std::ostream &os, const std::vector<T> &arr) {
     return os;
 }
 
-// Overload << for printing arrays
+// Overload << for printing vectors
 template <typename T, size_t N>
 std::ostream &operator<<(std::ostream &os, const std::array<T, N> &arr) {
     os << "[";
@@ -61,6 +62,31 @@ std::ostream &operator<<(std::ostream &os, const std::pair<T, T> &pair) {
  * @param arr The vector to calculate the average of
  * @return The average value of the vector, or 0 if the vector is empty
  */
+
+/**
+ * @brief Prints the elements of a C-style array in a formatted manner
+ * 
+ * @param arr The C-style array to print
+ * 
+ * The function outputs the elements of the array to the standard output stream 
+ * in a human-readable format, enclosed in square brackets and separated by commas.
+ */
+
+template <typename T, std::size_t N>
+auto printCArr(const T(&arr)[N]) -> void {
+    for (size_t i {0}; i < N; ++i ) {
+        if (i == 0) {
+           std::cout << "[" << arr[i] << ", "; 
+        } 
+        else if (i > 0 && i < N - 1) {
+           std::cout << arr[i] << ", "; 
+        }
+        else {
+            std::cout << arr[i] << "]\n";
+        }
+    }
+}
+
 template <typename T>
 float avgVal(const std::vector<T> &arr) {
     if (arr.size() != 0)
@@ -141,24 +167,20 @@ std::string tJoin(const T &arr) {
  */
 
 template <typename T>
-std::vector<T> tSplit(const std::string &s, const char del = ',', bool is_int = false) {
+std::vector<T> tSplit(const std::string &s, const char delim = ',') {
     std::vector<T> result;
-    std::stringstream ss(s);
-    std::string word;
-    while (std::getline(ss, word, del)) {
-        if (is_int) {
-            result.push_back(static_cast<T>(std::stoi(word)));
-        } else {
-            std::stringstream conv(word);
-            T temp;
-            if constexpr (std::is_same_v<T, std::string>) {
-                result.push_back(word);
-            } else {
-                conv >> temp;
-                result.push_back(temp);
-            }
+    std::istringstream iss(s);
+    std::string token;
+
+    while (std::getline(iss, token, delim)) {
+        if constexpr (std::is_same_v<T, int>) {
+            result.push_back(std::stoi(token));
+        }
+        else {
+            result.push_back(token);
         }
     }
+
     return result;
 }
 
