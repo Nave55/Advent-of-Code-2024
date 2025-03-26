@@ -166,6 +166,19 @@ std::string tJoin(const T &arr) {
  * @return A vector of elements of type T obtained by splitting the string s using the delimiter del.
  */
 
+/**
+ * @brief Splits a string into a vector of elements of type T based on a given delimiter.
+ *
+ * @details This function splits the input string s into a vector of elements of type T. The
+ *          elements are obtained by splitting the string at each occurrence of the delimiter
+ *          character. If the type T is int, the elements of the vector are converted to integers
+ *          using std::stoi. Otherwise, the elements are simply copied as strings.
+ *
+ * @param s The input string to be split.
+ * @param del The delimiter character to split the string on. Default is ','.
+ * @return A vector of elements of type T obtained by splitting the string s using the delimiter del.
+ */
+
 template <typename T>
 std::vector<T> tSplit(const std::string &s, const char delim = ',') {
     std::vector<T> result;
@@ -175,8 +188,7 @@ std::vector<T> tSplit(const std::string &s, const char delim = ',') {
     while (std::getline(iss, token, delim)) {
         if constexpr (std::is_same_v<T, int>) {
             result.push_back(std::stoi(token));
-        }
-        else {
+        } else {
             result.push_back(token);
         }
     }
