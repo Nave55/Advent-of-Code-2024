@@ -32,7 +32,7 @@ auto parseFile() -> ParseFile {
 
         t[1].erase(t[1].begin());
         nums[ind] = tSplit<int>(t[1], ' ');
-;
+
         ind++;
    }
    
