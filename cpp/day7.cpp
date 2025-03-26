@@ -44,7 +44,7 @@ auto concat(long long a, long long b) -> long long {
 }
 
 auto evaluate(const vi &nums, long long target, size_t index, long long curr_val, bool pt1) -> bool {
-    if (index == 0) {
+	if (index == 0) {
 		return evaluate(nums, target, index + 1, nums[0], pt1);
 	}
 
