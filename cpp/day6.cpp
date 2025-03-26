@@ -7,8 +7,8 @@
 
 typedef std::pair<int, int> pi;
 typedef std::unordered_map<pi, int, pair_hash> mpi;
-typedef std::unordered_map<int, std::pair<int, int>> mipi;
-typedef std::unordered_set<std::pair<int, int>, pair_hash> spi;
+typedef std::unordered_map<int, pi> mipi;
+typedef std::unordered_set<pi, pair_hash> spi;
 
 struct ParseFile {mpi locs; pi start;};
 constexpr int ROWS = 130;
