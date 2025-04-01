@@ -319,6 +319,18 @@ T arrValue(const T (&arr)[N][M], const std::pair<int, int> &arr2) {
     return arr[arr2.first][arr2.second];
 }
 
+/**
+ * @brief Retrieves the value from a 2D array at a specified row and column index
+ *
+ * @param arr The 2D array from which to retrieve the value
+ * @param arr2 A pair representing the row and column indices
+ * @return The value at the specified row and column index in the 2D array
+ */
+template <typename T, size_t N, size_t M>
+T arrValue(const std::array<std::array<T, N>, M> &arr, const std::pair<int, int> &arr2) {
+    return arr[arr2.first][arr2.second];
+}
+
 template <typename T>
 bool inBounds(const std::vector<std::vector<T>> &arr, const std::pair<int, int> &pos) {
 /**
