@@ -19,15 +19,15 @@ main :: proc() {
     context.allocator = arena_allocator
     defer vm.arena_destroy(&arena)
 
-    arr, mp := parse_file("input/day8.txt")
-    slopes := antSlopes(mp)
-    pt1 := solution(arr, mp, slopes)
-    pt2 := solution2(mp, slopes)
+    arr, ants := parse_file("input/day8.txt")
+    slopes := antSlopes(ants)
+    pt1 := solution(arr, slopes)
+    pt2 := solution2(slopes)
 
     fmt.printfln("Part 1: %v\nPart 2: %v", pt1, pt2)
 }
 
-parse_file :: proc(filepath: string) -> (arr: [ROWS][COLS]rune, mp: map[rune][dynamic][2]int) {
+parse_file :: proc(filepath: string) -> (arr: [ROWS][COLS]rune, ants: map[rune][dynamic][2]int) {
 	data, ok := os.read_entire_file(filepath)
 	if !ok do return
 	defer delete(data)
@@ -39,8 +39,8 @@ parse_file :: proc(filepath: string) -> (arr: [ROWS][COLS]rune, mp: map[rune][dy
         for c_val, c_ind in line {
             arr[r_ind][c_ind] = c_val
             if c_val != '.' {
-                if c_val in mp == false do mp[c_val] = {}
-                append(&mp[c_val], [2]int{r_ind, c_ind})
+                if c_val in ants == false do ants[c_val] = {}
+                append(&ants[c_val], [2]int{r_ind, c_ind})
             }
         }
         r_ind += 1
@@ -62,7 +62,7 @@ antSlopes :: proc(ants: map[rune][dynamic][2]int) -> (slopes: map[[2]int][dynami
     return
 }
 
-solution :: proc(mat: [ROWS][COLS]rune, ants: map[rune][dynamic][2]int, slopes: map[[2]int][dynamic][2]int) -> int {
+solution :: proc(mat: [ROWS][COLS]rune, slopes: map[[2]int][dynamic][2]int) -> int {
 	ttl: map[[2]int]struct{}
 
 	for key, value in slopes {
@@ -82,7 +82,7 @@ solution :: proc(mat: [ROWS][COLS]rune, ants: map[rune][dynamic][2]int, slopes: 
 	return len(ttl)
 }
 
-solution2 :: proc(ants: map[rune][dynamic][2]int, slopes: map[[2]int][dynamic][2]int) -> int {
+solution2 :: proc(slopes: map[[2]int][dynamic][2]int) -> int {
     ttl: map[[2]int]struct{}
 
     for key, value in slopes {
@@ -104,5 +104,6 @@ solution2 :: proc(ants: map[rune][dynamic][2]int, slopes: map[[2]int][dynamic][2
             }
         }
     }
+    
     return len(ttl)
 }
