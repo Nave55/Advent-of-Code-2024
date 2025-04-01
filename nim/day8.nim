@@ -7,21 +7,22 @@ type
     SC = seq[char]
     SSC = seq[SC]
 
-proc readInput(): (HCSTI, int, int, SSC) =
-    let file = open("input/day8.txt", fmRead);
-    defer: file.close()
+const 
+    width = 50
+    height = 50
 
-    for i in file.lines():
-      result[3] &= i.toSeq()
+proc readInput(): (HCSTI, SSC) =
+  let file = open("input/day8.txt", fmRead);
+  defer: file.close()
 
-    for r_ind, r_val in result[3]:
-      for c_ind, c_val in r_val:
-        if c_val != '.':
-         discard result[0].hasKeyOrPut(c_val, @[])
-         result[0][c_val] &= (r_ind, c_ind)
+  for i in file.lines():
+    result[1] &= i.toSeq()
 
-    result[1] = result[3][0].len()
-    result[2] = result[3].len()
+  for r_ind, r_val in result[1]:
+    for c_ind, c_val in r_val:
+      if c_val != '.':
+        discard result[0].hasKeyOrPut(c_val, @[])
+        result[0][c_val] &= (r_ind, c_ind)
          
 func antSlopes(ants: HCSTI): HTSTI =
   for value in ants.values():
@@ -30,7 +31,7 @@ func antSlopes(ants: HCSTI): HTSTI =
         discard result.hasKeyOrPut(value[i], @[])
         result[value[i]] &= value[i] - value[j]
 
-func solution(mat: SSC, ants: HCSTI, slopes: HTSTI, width, height: int): int =
+func solution(mat: SSC, slopes: HTSTI): int =
   var ttl = initHashSet[string]()
   for key, value in slopes:
     for i in value:
@@ -45,7 +46,7 @@ func solution(mat: SSC, ants: HCSTI, slopes: HTSTI, width, height: int): int =
         
   return ttl.len()
         
-func solution2(ants: HCSTI, slopes: HTSTI, width, height: int): int =
+func solution2(slopes: HTSTI): int =
   var ttl = initHashSet[string]()
   for key, value in slopes:
     ttl.incl(key.tupToStr())
@@ -67,8 +68,8 @@ func solution2(ants: HCSTI, slopes: HTSTI, width, height: int): int =
   return ttl.len()
     
 let 
-  (ants, width, height, mat) = readInput()
+  (ants, mat) = readInput()
   slopes = antSlopes(ants)
-  pt1 = solution(mat, ants, slopes, width, height)
-  pt2 = solution2(ants, slopes, width, height)
+  pt1 = solution(mat, slopes)
+  pt2 = solution2(slopes)
 echo &"Solution 1: {pt1}\nSolution 2: {pt2}"
