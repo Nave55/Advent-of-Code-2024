@@ -14,8 +14,8 @@ class Day8 {
     static function main() {
         parse_file();
         antSlopes(ants);
-        var pt1 = solution(mat, ants, slopes, width, height);
-        var pt2 = solution2(ants, slopes, width, height);        
+        var pt1 = solution();
+        var pt2 = solution2();        
         Sys.println('Part 1: ${pt1}\nPart 2: ${pt2}');
     }
 
@@ -46,7 +46,7 @@ class Day8 {
         }
     }
 
-    static function solution(mat: AAS, ants: MSAV2, slopes: MSAV2, width: Int, height: Int) {
+    static function solution() {
         var ttl: Set<String> = new Set([]);
         for (key => value in slopes) {
             for (i in value) {
@@ -67,7 +67,7 @@ class Day8 {
         return ttl++.length;
     }
 
-    static function solution2(ants: MSAV2, slopes: MSAV2, width: Int, height: Int) {
+    static function solution2() {
         var ttl: Set<String> = new Set([]);
         for (key => value in slopes) {
             ttl.push((key));
