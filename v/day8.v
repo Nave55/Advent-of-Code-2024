@@ -6,10 +6,10 @@ const width := 50
 const height := 50
 
 fn main() {
-	mat, mp := parse_file()
-	slopes := ant_slopes(mp)
-	pt1 := solution(mat, mp, slopes)
-	pt2 := solution2(mp, slopes)
+	mat, ants := parse_file()
+	slopes := ant_slopes(ants)
+	pt1 := solution(mat, slopes)
+	pt2 := solution2(slopes)
 	println('Part 1: ${pt1}\nPart 2: ${pt2}')
 }
 
@@ -46,7 +46,7 @@ fn ant_slopes(ants map[rune][]t.Vec2[int]) map[string][]t.Vec2[int] {
 	return slopes
 }
 
-fn solution(mat [][]rune, ants map[rune][]t.Vec2[int], slopes map[string][]t.Vec2[int]) int {
+fn solution(mat [][]rune, slopes map[string][]t.Vec2[int]) int {
 	mut ttl := dt.Set[string]{}
 
 	for key, value in slopes {
@@ -68,7 +68,7 @@ fn solution(mat [][]rune, ants map[rune][]t.Vec2[int], slopes map[string][]t.Vec
 	return ttl.size()
 }
 
-fn solution2(ants map[rune][]t.Vec2[int], slopes map[string][]t.Vec2[int]) int {
+fn solution2(slopes map[string][]t.Vec2[int]) int {
 	mut ttl := dt.Set[string]{};
 
 	for key, value in slopes {
