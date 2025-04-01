@@ -9,8 +9,8 @@ class Day8 {
     static var slopes: MSAV2 = [];
     static var ants: MSAV2 = [];
     static var mat: AAS = [];
-    static var height: Int = 0;
-    static var width: Int = 0;
+    static var height: Int = 50;
+    static var width: Int = 50;
     static function main() {
         parse_file();
         antSlopes(ants);
@@ -28,8 +28,6 @@ class Day8 {
                     ants[c_val].push({x: r_ind, y: c_ind});
                 }
             }
-            height = mat.length;
-            width = mat[0].length;
         }
     }
 
