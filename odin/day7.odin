@@ -16,15 +16,15 @@ main :: proc() {
 parse_file :: proc(filepath: string) -> (targets: [850]int, nums: [850]sa.Small_Array(12, int)) {
 	data, ok := os.read_entire_file(filepath, context.temp_allocator)
 	if !ok do return
-    defer free_all(context.temp_allocator)
+    	defer free_all(context.temp_allocator)
 	
 	it := string(data)
-    ind := 0
+   	 ind := 0
 
 	for line in strings.split_lines_iterator(&it) {
-        tmp_arr := strings.split(line, ": ", context.temp_allocator)
-        targets[ind] = strconv.atoi(tmp_arr[0])
-        tmp_nums: sa.Small_Array(12, int) 
+        	tmp_arr := strings.split(line, ": ", context.temp_allocator)
+        	targets[ind] = strconv.atoi(tmp_arr[0])
+        	tmp_nums: sa.Small_Array(12, int) 
 
         for val, ind in strings.split(tmp_arr[1], " ", context.temp_allocator) {
         	sa.append(&tmp_nums, strconv.atoi(val))
@@ -56,7 +56,7 @@ evaluate :: proc(nums: []int, target, index, currentVal: int, pt1: bool) -> bool
 
 solution :: proc (a: []int, b: []sa.Small_Array(12, int)) -> (ttl, ttl2: int) {
 	for _, ind in b {
-        sli := sa.slice(&b[ind])
+        	sli := sa.slice(&b[ind])
 		if evaluate(sli, a[ind], 0, 0, true) do ttl += a[ind]
 		if evaluate(sli, a[ind], 0, 0, false) do ttl2 += a[ind]
 	}
