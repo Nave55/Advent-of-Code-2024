@@ -8,13 +8,16 @@ fn main() {
 
 fn parse_file() ([]i64, [][]i64) {
 	lines := os.read_lines('input/day7.txt') or { panic(err) }
-	mut targets := []i64{}
-	mut nums := [][]i64{} 
+	mut targets := []i64{len: 850, cap: 850, init: 0}
+	mut nums := [][]i64{len: 850, cap: 850, init: []i64{len: 0, cap: 12}} 
 
+	mut ind := 0
 	for i in lines {
 		tmp := i.replace(" ", ",").split(":,")
-		targets << tmp[0].i64()
-		nums << tmp[1].split(",").map(it.i64())
+		targets[ind] = tmp[0].i64()
+		nums[ind] = tmp[1].split(",").map(it.i64())
+
+		ind++
 	}
 
 	return targets, nums
