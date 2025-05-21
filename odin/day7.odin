@@ -5,40 +5,34 @@ import "core:os"
 import "core:strings"
 import "core:strconv"
 import sa "core:container/small_array"
-import vm "core:mem/virtual"
-import "core:mem"
 
 main :: proc() {
-    arena: vm.Arena
-    err := vm.arena_init_growing(&arena, 5 * mem.Megabyte)
-    assert(err == .None)
-    arena_allocator := vm.arena_allocator(&arena)
-    context.allocator = arena_allocator
-    defer vm.arena_destroy(&arena)
-
     targets, nums := parse_file("input/day7.txt")
-    pt1, pt2 := solution(targets, nums)
+    pt1, pt2 := solution(targets[:], nums[:])
 
     fmt.printfln("Part 1: %v\nPart 2: %v", pt1, pt2)
 }
 
-// @require_results
-parse_file :: proc(filepath: string) -> (targets: [dynamic]int, nums: [dynamic]sa.Small_Array(12, int)) {
-	data, ok := os.read_entire_file(filepath)
+parse_file :: proc(filepath: string) -> (targets: [850]int, nums: [850]sa.Small_Array(12, int)) {
+	data, ok := os.read_entire_file(filepath, context.temp_allocator)
 	if !ok do return
-	defer delete(data)
-    	defer free_all(context.temp_allocator)
+    defer free_all(context.temp_allocator)
 	
 	it := string(data)
-	
+    ind := 0
+
 	for line in strings.split_lines_iterator(&it) {
         tmp_arr := strings.split(line, ": ", context.temp_allocator)
-        append(&targets, strconv.atoi(tmp_arr[0]))
+        targets[ind] = strconv.atoi(tmp_arr[0])
         tmp_nums: sa.Small_Array(12, int) 
+
         for val, ind in strings.split(tmp_arr[1], " ", context.temp_allocator) {
             sa.append(&tmp_nums, strconv.atoi(val))
         }
-        append(&nums, tmp_nums)
+
+        nums[ind] = tmp_nums
+
+        ind += 1
     }
 
     return
@@ -60,11 +54,12 @@ evaluate :: proc(nums: []int, target, index, currentVal: int, pt1: bool) -> bool
 	return false
 }
 
-solution :: proc (a: [dynamic]int, b: [dynamic]sa.Small_Array(12, int)) -> (ttl, ttl2: int) {
+solution :: proc (a: []int, b: []sa.Small_Array(12, int)) -> (ttl, ttl2: int) {
 	for _, ind in b {
         sli := sa.slice(&b[ind])
 		if evaluate(sli, a[ind], 0, 0, true) do ttl += a[ind]
 		if evaluate(sli, a[ind], 0, 0, false) do ttl2 += a[ind]
 	}
+    
 	return ttl, ttl2
 }
