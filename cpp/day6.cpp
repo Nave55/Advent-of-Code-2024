@@ -7,14 +7,13 @@
 
 typedef std::pair<int, int> pi;
 typedef std::unordered_map<pi, int, pair_hash> mpi;
-typedef std::unordered_map<int, pi> mipi;
 typedef std::unordered_set<pi, pair_hash> spi;
 
-struct ParseFile {mpi locs; pi start;};
+struct ParseFile { mpi locs; pi start; };
 constexpr int ROWS = 130;
 constexpr int COLS = 130;
 char mat[ROWS][COLS] {{'.'}};
-const mipi dirs {{0, {-1, 0}}, {1, {0, 1}}, {2, {1, 0}}, {3, {0, -1}}};
+const pi dirs[4] {{-1, 0}, {0, 1}, {1, 0}, {0, -1}};
 
 auto parseFile() -> ParseFile;
 auto solution(pi) -> spi;
@@ -23,9 +22,9 @@ auto solution2(const pi&, const mpi&, const spi&) -> int;
 auto main() -> int {
     auto [locs, start] = parseFile();
     
-    auto sol1 = solution(start);
-    auto pt2 = solution2(start, locs, sol1);
-    printf("Part 1: %d\nPart 2: %d", (int) sol1.size(), pt2); 
+    auto pt1 = solution(start);
+    auto pt2 = solution2(start, locs, pt1);
+    printf("Part 1: %d\nPart 2: %d", (int) pt1.size(), pt2); 
 }
 
 auto parseFile() -> ParseFile {
@@ -35,6 +34,7 @@ auto parseFile() -> ParseFile {
     std::ifstream file ("input/day6.txt");
     assert(file);
     std::string line;
+    
     size_t i {0};
     while (std::getline(file, line)) {    
         for (size_t j {0}; j < ROWS; ++j) {
@@ -43,6 +43,7 @@ auto parseFile() -> ParseFile {
             if (line[j] == '^') start = pair;
             if (line[j] == '#') locs[pair] = 0;
         }
+        
         ++i;         
     }
     
@@ -58,7 +59,7 @@ auto solution(pi pos) -> spi {
     spi visited;
     
     while (inbounds(pos)) {
-        auto n_pos = dirs.at(facing) + pos;
+        auto n_pos = dirs[facing] + pos;
         if (mat[n_pos.first][n_pos.second] == '#') {
             facing++;
             facing = facing % 4;
@@ -83,7 +84,7 @@ auto solution2(const pi &start, const mpi &loc, const spi &empty) -> int {
         locs[i] = 0;
 
         while (inbounds(pos)) {
-            auto n_pos = dirs.at(facing) + pos;;
+            auto n_pos = dirs[facing] + pos;;
             if (arrValue(mat, n_pos) == '#') {
                 facing++;
                 locs[n_pos]++;
