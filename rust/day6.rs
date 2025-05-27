@@ -3,7 +3,6 @@ use std::fs::read_to_string;
 
 type TI = (i32, i32);
 type STI = HashSet<TI>;
-type MITI = HashMap<i32, TI>;
 type MTII = HashMap<TI, i32>;
 type Mat = [[char; 130]; 130];
 
@@ -11,7 +10,7 @@ static ROWS: usize = 130;
 static COLS: usize = 130;
 
 fn main() {
-    let dirs: MITI = [(0, (-1, 0)), (1, (0, 1)), (2, (1, 0)), (3, (0, -1))].into();
+    let dirs = [(-1, 0), (0, 1), (1, 0), (0, -1)];
     let (pos, mat, locs) = parse_file();
     let visited = solution(&pos, &mat, &dirs);
     let pt2 = solution2(&pos, &mat, &locs, &dirs, &visited);
@@ -51,13 +50,13 @@ fn is_within_bounds(pos: TI) -> bool {
     pos.0 > 0 && (pos.0 as usize) < ROWS - 1 && pos.1 > 0 && (pos.1 as usize) < COLS - 1
 }
 
-fn solution(pos: &TI, mat: &Mat, dirs: &MITI) -> STI {
+fn solution(pos: &TI, mat: &Mat, dirs: &[TI]) -> STI {
     let mut facing = 0;
     let mut pos = *pos;
     let mut visited: STI = HashSet::new();
 
     while is_within_bounds(pos) {
-        let next_pos = add_tups(pos, dirs[&facing]);
+        let next_pos = add_tups(pos, dirs[facing]);
         if arr_value(mat, &next_pos) == '#' {
             facing += 1;
             facing = facing % 4
@@ -71,7 +70,7 @@ fn solution(pos: &TI, mat: &Mat, dirs: &MITI) -> STI {
     visited
 }
 
-fn solution2(pos: &TI, mat: &Mat, locs: &MTII, dirs: &MITI, empty: &STI) -> i32 {
+fn solution2(pos: &TI, mat: &Mat, locs: &MTII, dirs: &[TI], empty: &STI) -> i32 {
     let mut locs = locs.clone();
     let mut mat = *mat;
     let mut ttl = 0;
@@ -83,7 +82,7 @@ fn solution2(pos: &TI, mat: &Mat, locs: &MTII, dirs: &MITI, empty: &STI) -> i32 
         locs.insert(*i, 0);
 
         while is_within_bounds(pos) {
-            let next_pos = add_tups(pos, dirs[&facing]);
+            let next_pos = add_tups(pos, dirs[facing]);
             if arr_value(&mat, &next_pos) == '#' {
                 facing += 1;
                 if let Some(value) = locs.get_mut(&next_pos) {
