@@ -36,8 +36,6 @@ parse_file :: proc(
 ) {
 	data, ok := os.read_entire_file(filepath)
 	if !ok do return
-	defer delete(data)
-
 	it := string(data)
 
 	r_ind := 0
