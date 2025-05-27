@@ -26,7 +26,7 @@ var (mat, start, locs) = readInput()
 let
   width = mat[0].len() - 1
   height = mat.len() - 1 
-  dirs = {0: (-1, 0), 1: (0, 1), 2: (1, 0), 3: (0, -1)}.toTable
+  dirs = [(-1, 0), (0, 1), (1, 0), (0, -1)]
   
 proc pt1(mat: AAC, start: TI): (int, HSI) =
   var 
@@ -47,6 +47,7 @@ proc pt1(mat: AAC, start: TI): (int, HSI) =
 
 proc pt2(mat: var AAC, start: TI, empty: HSI, locs: var TSI): int =
   for i in empty:
+  
     var
       facing = 0
       pos = start
