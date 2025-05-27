@@ -6,9 +6,10 @@ using hx.strings.Strings;
 using Lambda;
 
 class Day6 {
-    static var dirs: Map<Int, Vec2> = [0 => {x: -1, y: 0}, 1 => {x: 0, y: 1}, 2 => {x: 1, y: 0}, 3 => {x: 0, y: -1}];
+    static var dirs: Array<Vec2> = [{x: -1, y: 0}, {x: 0, y: 1}, {x: 1, y: 0}, {x: 0, y: -1}];
     static var rows = 130;
     static var cols = 130;
+    
     static function main() {
         var con = parse_file();
         var s1 = solution(con.mat, con.start);
