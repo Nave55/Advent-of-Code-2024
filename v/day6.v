@@ -2,13 +2,15 @@ import os
 import tools as t
 import datatypes { Set }
 
+type VI = t.Vec2[int]
+
 const rows = 130
 const cols = 130
 const dirs = [
-	t.Vec2[int]{-1, 0},
-	t.Vec2[int]{0, 1},
-	t.Vec2[int]{1, 0},
-	t.Vec2[int]{0, -1},
+	VI{-1, 0},
+	VI{0, 1},
+	VI{1, 0},
+	VI{0, -1},
 ]
 
 fn main() {
@@ -19,17 +21,17 @@ fn main() {
 	println('Part 1: ${pt1}\nPart 2: ${pt2}')
 }
 
-fn parse_file() !([][]rune, map[string]int, t.Vec2[int]) {
+fn parse_file() !([][]rune, map[string]int, VI) {
 	lines := os.read_lines('input/day6.txt')!
 	mut locs := map[string]int{}
 	mut arr := [][]rune{len: rows, cap: rows, init: []rune{len: cols, cap: cols, init: `.`}}
-	mut start := t.Vec2[int]{}
+	mut start := VI{}
 
 	for r_ind, r_val in lines {
 		for c_ind, c_val in r_val {
 			arr[r_ind][c_ind] = lines[r_ind][c_ind]
 			if c_val == `^` {
-				start = t.Vec2{r_ind, c_ind}
+				start = VI{r_ind, c_ind}
 			}
 			if c_val == `#` {
 				locs[r_ind.str() + ',' + c_ind.str()] = 0
@@ -40,11 +42,11 @@ fn parse_file() !([][]rune, map[string]int, t.Vec2[int]) {
 	return arr, locs, start
 }
 
-fn inbounds(pos t.Vec2[int]) bool {
+fn inbounds(pos VI) bool {
 	return pos.x > 0 && pos.x < rows - 1 && pos.y > 0 && pos.y < cols - 1
 }
 
-fn solution1(mat [][]rune, start t.Vec2[int]) (int, Set[string]) {
+fn solution1(mat [][]rune, start VI) (int, Set[string]) {
 	mut facing := 0
 	mut pos := start
 	mut visited := Set[string]{}
@@ -65,7 +67,7 @@ fn solution1(mat [][]rune, start t.Vec2[int]) (int, Set[string]) {
 	return visited.size(), visited
 }
 
-fn solution2(mut mat [][]rune, start t.Vec2[int], mut locs map[string]int, mut empty Set[string]) !int {
+fn solution2(mut mat [][]rune, start VI, mut locs map[string]int, mut empty Set[string]) !int {
 	mut ttl := 0
 	for !empty.is_empty() {
 		v := string(empty.pop() or { break })
