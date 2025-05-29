@@ -22,8 +22,6 @@ auto solution(const aac &arr, const mpivpi &slopes) -> size_t;
 auto solution2(const mpivpi &slopes) -> size_t;
 
 auto main() -> int {
-    parseFile();
-
     auto [arr, ants] = parseFile();
     auto slopes = antSlopes(ants);
     auto sol1 = solution(arr, slopes);
