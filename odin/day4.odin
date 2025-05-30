@@ -3,11 +3,20 @@ package AoC
 import "../Tools"
 import sa "core:container/small_array"
 import "core:fmt"
+import "core:mem"
+import vm "core:mem/virtual"
 import "core:os"
 import "core:strings"
 import "core:unicode/utf8"
 
 main :: proc() {
+	arena: vm.Arena
+	err := vm.arena_init_static(&arena, 1 * mem.Megabyte)
+	assert(err == .None)
+	arena_allocator := vm.arena_allocator(&arena)
+	context.allocator = arena_allocator
+	defer vm.arena_destroy(&arena)
+
 	solution("input/day4.txt")
 }
 
@@ -16,13 +25,11 @@ solution :: proc(filepath: string) {
 	data, ok := os.read_entire_file(filepath)
 	if !ok do return
 	it := string(data)
-	defer {delete(arr);delete(data)}
 
 	for line in strings.split_lines_iterator(&it) {
 		tmp := utf8.string_to_runes(line)
 		append(&arr, tmp)
 	}
-	defer { for i in arr do delete(i) }
 
 	pt1 := checkXmas(&arr)
 	pt2 := checkX(&arr)
@@ -59,7 +66,6 @@ checkXmas :: proc(mat: ^[dynamic][]rune) -> (ttl: u32) {
 	}
 
 	valid_inds: [dynamic][2]int
-	defer delete(valid_inds)
 	for r_val, r_ind in mat {
 		for c_val, c_ind in r_val {
 			tmp: [2]int = {r_ind, c_ind}
@@ -74,12 +80,16 @@ checkXmas :: proc(mat: ^[dynamic][]rune) -> (ttl: u32) {
 			defer free_all(context.temp_allocator)
 			cnt += 1
 			tmp: [2]int = {val.x, val.y} + v
-			if (tmp.x >= 0 && tmp.x < height) && (tmp.y >= 0 && tmp.y < width) {
+			if (tmp.x >= 0 && tmp.x < height) &&
+			   (tmp.y >= 0 && tmp.y < width) {
 				sa.append(&str, rune(mat[tmp.x][tmp.y]))
 			}
 			if cnt %% 3 == 0 {
 				sa.append(&str, 'X')
-				s := utf8.runes_to_string(sa.slice(&str), context.temp_allocator)
+				s := utf8.runes_to_string(
+					sa.slice(&str),
+					context.temp_allocator,
+				)
 				if s == "XMAS" || s == "SAMX" do ttl += 1
 				sa.clear(&str)
 			}
@@ -90,7 +100,6 @@ checkXmas :: proc(mat: ^[dynamic][]rune) -> (ttl: u32) {
 
 checkX :: proc(mat: ^[dynamic][]rune) -> (ttl: u32) {
 	valid_inds := make([dynamic][2]int)
-	defer delete(valid_inds)
 	for r_val, r_ind in mat {
 		for c_val, c_ind in r_val {
 			if c_val == 'A' {
