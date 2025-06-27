@@ -27,7 +27,7 @@ auto main() -> int {
     auto sol1 = solution(arr, slopes);
     auto sol2 = solution2(slopes);
 
-    std::cout << std::format("Part 1: {}\nPart 2: {}", sol1, sol2) << "\n";
+    std::printf("Part 1: %zu\nPart 2: %zu", sol1, sol2);
 }
 
 auto parseFile() -> ParseFile {
@@ -73,7 +73,7 @@ auto solution(const aac &arr, const mpivpi &slopes) -> size_t {
     for (const auto &vals : slopes) {
         for (const auto &i : vals.second) {
             auto vec = vals.first;
-            auto symb = arr[i.first][i.second];
+            char symb = inBounds(i, ROWS, COLS) ? arr[i.first][i.second] : '*';
             auto pos = i + vals.first;
             auto neg = vec - (i * 2);
 
