@@ -9,8 +9,9 @@ class Day8 {
     static var slopes: MSAV2 = [];
     static var ants: MSAV2 = [];
     static var mat: AAS = [];
-    static var height: Int = 50;
-    static var width: Int = 50;
+    static inline var HEIGHT: Int = 50;
+    static inline var WIDTH: Int = 50;
+    
     static function main() {
         parse_file();
         antSlopes(ants);
@@ -54,10 +55,10 @@ class Day8 {
                 var pos = tup_k + i;
                 var neg = tup_k - (tup_i * 2);
 
-                if (inBounds(pos, width, height) && fetchVal(mat, pos) != symb) {
+                if (inBounds(pos, WIDTH, HEIGHT) && fetchVal(mat, pos) != symb) {
                     ttl.push(vecToStr(pos));    
                 }
-                if (inBounds(neg, width, height) && fetchVal(mat, neg) != symb) {
+                if (inBounds(neg, WIDTH, HEIGHT) && fetchVal(mat, neg) != symb) {
                     ttl.push(vecToStr(neg));    
                 }
             }
@@ -73,7 +74,7 @@ class Day8 {
                 var val = strToVec(key);
                 while (true) {
                     val = new Tup(val) + i;
-                    if (inBounds(val, width, height)) ttl.push(vecToStr(val));
+                    if (inBounds(val, WIDTH, HEIGHT)) ttl.push(vecToStr(val));
                     else {
                         val = strToVec(key);
                         break;
@@ -81,7 +82,7 @@ class Day8 {
                 }
                 while (true) {
                     val = new Tup(val) - i;
-                    if (inBounds(val, width, height)) ttl.push(vecToStr(val));
+                    if (inBounds(val, WIDTH, HEIGHT)) ttl.push(vecToStr(val));
                     else break;
                 }
             }
