@@ -12,15 +12,14 @@
 #include <utility>
 #include <fstream>
 
-typedef std::vector<int> vi;
-typedef std::vector<std::vector<int>> vvi;
-typedef std::vector<float> vf;
-typedef std::vector<std::vector<float>> vvf;
-typedef std::vector<std::string> vs;
-typedef std::vector<std::vector<std::string>> vvs;
-typedef std::vector<char> vc;
-typedef std::vector<std::vector<char>> vvc;
-
+using vi = std::vector<int>;
+using vvi = std::vector<std::vector<int>>;
+using vf = std::vector<float>;
+using vvf = std::vector<std::vector<float>>;
+using vs = std::vector<std::string>;
+using vvs = std::vector<std::vector<std::string>>;
+using vc = std::vector<char>;
+using vvc = std::vector<std::vector<char>>;
 
 // Overload << for printing vectors
 template <typename T>
