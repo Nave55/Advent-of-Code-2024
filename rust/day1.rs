@@ -39,5 +39,5 @@ fn solution(left: &[i32], right: &[i32]) -> i32 {
 fn solution2(left: &[i32], right: &[i32]) -> i32 {
     let l_set: HashSet<i32> = left.iter().copied().collect();
 
-    right.iter().filter(|r| l_set.contains(r)).copied().sum()
+    right.iter().filter(|r| l_set.contains(r)).sum()
 }
