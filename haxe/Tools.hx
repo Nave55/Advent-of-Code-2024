@@ -1,4 +1,3 @@
-import haxe.macro.Type.AnonType;
 import haxe.macro.Expr;
 import haxe.Int64;
 import hx.strings.Char;
@@ -37,6 +36,39 @@ typedef MI64 = Map<Int,    Int64>;
 typedef MS64 = Map<String, Int64>;
 
 /**
+ * [String Iterator]
+ 
+    Example:
+
+        var str = "esbzops qjh qfo";
+
+        for (i in new StringIterator(str, true)) {
+            trace(i);       
+        }
+
+@param str String
+@param lower Bool
+@return String
+*/
+
+class StringIterator {
+    var str: String;
+    var end: Int;
+    var i: Int;
+  
+    public inline function new(str: String, lower: Bool = false) {
+        lower == true ? this.str = str.toLowerCase() : this.str = str;
+        this.i = 0;
+        this.end = str.length;
+    }
+  
+    public inline function hasNext() return i < end;
+    public inline function next() {
+        return str.charAt(i++);
+    } 
+}
+
+/**
  * [Reverse Iterator]
  
     Example:
@@ -47,9 +79,9 @@ typedef MS64 = Map<String, Int64>;
             trace(i);       
         }
 
-@param a Start
-@param b End
-@return No return value
+@param start Start
+@param end End
+@return Int
 */
 
 class ReverseIterator {
@@ -63,7 +95,7 @@ class ReverseIterator {
   
     public inline function hasNext() return i >= end;
     public inline function next() return i--;
-  }
+}
 
 /**
  * [Swaps two variables]
@@ -600,11 +632,11 @@ function fetchVal<T>(mat: Array<Array<T>>, vec: Vec2): T {
 @return A String
 */
 
-function vecToStr(vec: Vec2) {
+inline function vecToStr(vec: Vec2) {
     return '${vec.x},${vec.y}';
 }
 
-function strToVec(str: String) {
+inline function strToVec(str: String) {
     var tmp = str.split(',').map(item -> parseInt(item) ?? 0);
     return {x: tmp[0], y: tmp[1]};
 }
