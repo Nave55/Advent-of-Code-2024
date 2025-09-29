@@ -4,43 +4,33 @@
 #include <fstream>
 #include <ranges>
 
-struct Pt1Pt2 {int pt1 {0}; int pt2 {0};};
-auto solution() -> Pt1Pt2;
+auto checkSafety(const vi &arr) -> bool {
+    if (arr.size() <= 1) return true;
 
-auto main() -> int {
-    auto [sum1, sum2] = solution();
-    printf("Part 1: %d\nPart 2: %d", sum1, sum2);
-}
-
-auto solver(const vi &arr, bool pt1, size_t n = 0) -> int {
-    if (n == arr.size()) return 0;
-
-    auto tmp = arr;
-    if (!pt1) tmp.erase(tmp.begin() + n);
-    auto p = (tmp.size() > 1) ? tmp[0] - tmp[1] : 0;
-
-    for (size_t j {1}; j < tmp.size(); ++j) {
-        auto dist = tmp[j - 1] - tmp[j];
-        if (p >= 0) {
-            if (dist > 3 || dist <= 0) {
-                if (pt1) return 0;
-                break;
-            }
-            if (j == tmp.size() - 1) return 1;
-        }
-        else if (p <= 0) {
-            if (dist < -3 || dist >= 0) {
-                if (pt1) return 0;
-                break;
-            }
-            if (j == tmp.size() - 1) return 1;
-        }
+    bool is_inc = true, is_dec = true;
+    for (size_t i = 0; i < arr.size() - 1; i++) {
+        if (!is_inc && !is_dec) return false;
+        int val = arr[i] - arr[i + 1];
+        if (is_inc) is_inc = val >= 1 && val <= 3;
+        if (is_dec) is_dec = val <= -1 && val >= -3;
     }
 
-    return solver(arr, false, n + 1);
+    return is_inc || is_dec;
 }
 
-auto solution() -> Pt1Pt2 {
+auto checkSafetyTwo(const vi &arr) -> bool {
+    if (checkSafety(arr)) return true;
+
+    for (size_t i = 0; i < arr.size(); i++) {
+        auto tmp = arr;
+        tmp.erase(tmp.begin() + i);
+        if (checkSafety(tmp)) return true;
+    }
+
+    return false;
+}
+
+auto solution() -> void {
     std::ifstream file ("input/day2.txt");
     auto lines = tl::views::getlines(file) | tl::to<std::vector<std::string>>();
     int sum1 {0}, sum2 {0};
@@ -51,10 +41,14 @@ auto solution() -> Pt1Pt2 {
             | std::views::transform([](auto x) {
                 return std::stoi(std::string(x.begin(), x.end()));})
             | tl::to<std::vector<int>>();
-
-        sum1 += solver(tmp, true);
-        sum2 += solver(tmp, false);
+        
+        if (checkSafety(tmp)) sum1++;
+        if (checkSafetyTwo(tmp)) sum2++;
     } 
 
-    return {sum1, sum2};
+    printf("Part 1: %d\nPart 2: %d\n", sum1, sum2);
+}
+
+auto main() -> int {
+    solution();
 }
