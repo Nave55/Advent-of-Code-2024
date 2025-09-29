@@ -1,63 +1,60 @@
 fn main() {
-    let (pt1, pt2) = solution();
-    println!("Part 1: {pt1}\nPart 2: {pt2}");
+    let arr = read_input("day1.txt");
+    solve(&arr)
 }
 
-fn solver(arr: &Vec<i32>, n: usize, pt1: bool) -> i32 {
-    if n == arr.len() {
-        return 0;
-    } else {
-        let mut tmp = arr.clone();
-        if !pt1 {
-            tmp.remove(n);
-        }
+fn read_input(path: &str) -> Vec<Vec<i32>> {
+    let data = std::fs::read_to_string(path).expect("Bad File Path");
 
-        let p = if tmp.len() > 1 { tmp[0] - tmp[1] } else { 0 };
+    let arr: Vec<Vec<i32>> = data
+        .lines()
+        .map(|line| {
+            line.split_whitespace()
+                .filter_map(|num| num.parse::<i32>().ok())
+                .collect()
+        })
+        .collect();
 
-        for j in 1..tmp.len() {
-            let dist = tmp[j - 1] - tmp[j];
-            if p >= 0 {
-                if dist > 3 || dist <= 0 {
-                    if pt1 {
-                        return 0;
-                    }
-                    break;
-                }
-                if j == tmp.len() - 1 {
-                    return 1;
-                }
-            } else if p <= 0 {
-                if dist < -3 || dist >= 0 {
-                    if pt1 {
-                        return 0;
-                    }
-                    break;
-                }
-                if j == tmp.len() - 1 {
-                    return 1;
-                }
-            }
+    arr
+}
+
+fn check_safety(arr: &[i32]) -> bool {
+    if arr.len() <= 1 {
+        return true;
+    }
+
+    let is_increasing_and_safe = arr.windows(2).all(|w| {
+        let diff = w[1] - w[0];
+        (diff > 0) && (diff <= 3)
+    });
+
+    let is_decreasing_and_safe = arr.windows(2).all(|w| {
+        let diff = w[0] - w[1];
+        (diff > 0) && (diff <= 3)
+    });
+
+    is_increasing_and_safe || is_decreasing_and_safe
+}
+
+fn check_safety_two(arr: &[i32]) -> bool {
+    if check_safety(arr) {
+        return true;
+    }
+
+    for i in 0..arr.len() {
+        let mut temp = arr.to_vec();
+        temp.remove(i);
+        if check_safety(&temp) {
+            return true;
         }
     }
 
-    solver(arr, n + 1, false)
+    false
 }
 
-fn solution() -> (i32, i32) {
-    let con = std::fs::read_to_string("../inputs/day2.txt").unwrap();
-    let mut sum1: i32 = 0;
-    let mut sum2: i32 = 0;
+fn solve(arr: &Vec<Vec<i32>>) {
+    let pt1 = arr.iter().filter(|l| check_safety(l)).count();
+    let pt2 = arr.iter().filter(|l| check_safety_two(l)).count();
 
-    con.lines()
-        .map(|line| {
-            line.split_whitespace()
-                .filter_map(|n| n.parse::<i32>().ok())
-                .collect()
-        })
-        .for_each(|i| {
-            sum1 += solver(&i, 0, true);
-            sum2 += solver(&i, 0, false);
-        });
-
-    (sum1, sum2)
+    println!("Part 1: {pt1}\nPart 2: {pt2}")
 }
