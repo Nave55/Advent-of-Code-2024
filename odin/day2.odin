@@ -39,14 +39,13 @@ solver :: proc(arr: []int, n: int, pt1: bool) -> int {
 }
 
 solution :: proc(filepath: string) -> (pt1, pt2: int) {
-    data, ok := os.read_entire_file(filepath); defer delete(data)
+    data, ok := os.read_entire_file(filepath, context.temp_allocator)
     if !ok do return
     it := string(data)
 
     for line in strings.split_lines_iterator(&it) {
         tmp := strings.split(line, " ", context.temp_allocator)
         int_arr := make([dynamic]int, context.temp_allocator)
-        defer free_all(context.temp_allocator)
         for i in tmp do append(&int_arr, strconv.atoi(i))
 
         pt1 += solver(int_arr[:], 0, true)
@@ -55,3 +54,4 @@ solution :: proc(filepath: string) -> (pt1, pt2: int) {
 
     return
 }
+
