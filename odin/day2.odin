@@ -3,7 +3,6 @@ package main
 import sa "core:container/small_array"
 import "core:fmt"
 import "core:os"
-import "core:slice"
 import "core:strconv"
 import "core:strings"
 
@@ -12,32 +11,31 @@ main :: proc() {
 	fmt.printf("Part 1 = %v\nPart 2 = %v\n", pt1, pt2)
 }
 
-solver :: proc(arr: sa.Small_Array(10, int), n: int, pt1: bool) -> int {
-	tmp := arr
-	if n == sa.len(arr) do return 0
+check_safety :: proc(arr: sa.Small_Array(10, int)) -> bool {
+	n := sa.len(arr)
+	if n <= 1 do return true
 
-	if !pt1 do sa.ordered_remove(&tmp, n)
-	sl := sa.slice(&tmp)
-	p := len(sl) > 1 ? sl[0] - sl[1] : 0
-
-	for j in 1 ..< len(sl) {
-		dist := sl[j - 1] - sl[j]
-		if p >= 0 {
-			if dist > 3 || dist <= 0 {
-				if pt1 do return 0
-				break
-			}
-			if j == len(sl) - 1 do return 1
-		} else if p <= 0 {
-			if dist < -3 || dist >= 0 {
-				if pt1 do return 0
-				break
-			}
-			if j == len(sl) - 1 do return 1
-		}
+	is_inc_safe, is_dec_safe := true, true
+	for i in 0 ..< n - 1 {
+		if !is_inc_safe && !is_dec_safe do break
+		val := sa.get(arr, i) - sa.get(arr, i + 1)
+		if is_inc_safe do is_inc_safe = val >= 1 && val <= 3
+		if is_dec_safe do is_dec_safe = val <= -1 && val >= -3
 	}
 
-	return solver(arr, n + 1, false)
+	return is_dec_safe || is_inc_safe
+}
+
+check_safety_two :: proc(arr: sa.Small_Array(10, int)) -> bool {
+	if check_safety(arr) do return true
+
+	for i in 0 ..< sa.len(arr) {
+		tmp := arr
+		sa.ordered_remove(&tmp, i)
+		if check_safety(tmp) do return true
+	}
+
+	return false
 }
 
 solution :: proc(filepath: string) -> (pt1, pt2: int) {
@@ -51,9 +49,10 @@ solution :: proc(filepath: string) -> (pt1, pt2: int) {
 		tmp := strings.split(line, " ", context.temp_allocator)
 		for i in tmp do sa.append(&s_arr, strconv.atoi(i))
 
-		pt1 += solver(s_arr, 0, true)
-		pt2 += solver(s_arr, 0, false)
+		if check_safety(s_arr) do pt1 += 1
+		if check_safety_two(s_arr) do pt2 += 1
 	}
 
 	return
 }
+
