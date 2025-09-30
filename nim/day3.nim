@@ -4,7 +4,7 @@ type IntSeq = seq[int]
 
 proc readInput(): seq[IntSeq] =
     let 
-      pattern = re"mul\(\d+,\d+\)|do(n't)?\(\)"      
+      pattern = re"mul\(\d+,\d+\)|do(n't)?\(\)"     
       replacements = @[
         ("mul", ""),
         ("(", ""),
@@ -34,3 +34,4 @@ proc solution(): (int, int) =
        
 let (pt1, pt2) = solution()
 echo &"Part 1: {pt1}\nPart 2: {pt2}"  
+
