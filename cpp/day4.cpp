@@ -78,10 +78,7 @@ auto solution() -> void {
     arr.emplace_back(a);
   }
 
-  auto sum1 = checkXmas(arr);
-  auto sum2 = checkX(arr);
-
-  printf("Part 1: %d\nPart 2: %d", sum1, sum2);
+  printf("Part 1: %d\nPart 2: %d", checkXmas(arr), checkX(arr));
 }
 
 auto main() -> int {
