@@ -11,7 +11,7 @@ import "core:unicode/utf8"
 
 main :: proc() {
 	arena: vm.Arena
-	err := vm.arena_init_static(&arena, 1 * mem.Megabyte)
+	err := vm.arena_init_static(&arena, 5 * mem.Megabyte)
 	assert(err == .None)
 	arena_allocator := vm.arena_allocator(&arena)
 	context.allocator = arena_allocator
@@ -23,13 +23,15 @@ main :: proc() {
 }
 
 solution :: proc(filepath: string) -> (pt1, pt2: u32, ok: bool) {
-	arr: [dynamic][]rune
 	data := os.read_entire_file(filepath) or_return
 	it := string(data)
 
+	arr: [140][]rune
+	ind := 0
 	for line in strings.split_lines_iterator(&it) {
 		tmp := utf8.string_to_runes(line)
-		append(&arr, tmp)
+		arr[ind] = tmp
+		ind += 1
 	}
 
 	return checkXmas(arr[:]), checkX(arr[:]), true
