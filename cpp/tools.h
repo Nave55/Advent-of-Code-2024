@@ -3,11 +3,14 @@
 #include <math.h>
 #include <algorithm>
 #include <array>
+#include <cassert>
 #include <fstream>
 #include <iostream>
 #include <memory>
 #include <numeric>
 #include <ostream>
+#include <ranges>
+#include <span>
 #include <sstream>
 #include <string>
 #include <utility>
@@ -21,6 +24,7 @@ typedef std::vector<std::string> vs;
 typedef std::vector<std::vector<std::string>> vvs;
 typedef std::vector<char> vc;
 typedef std::vector<std::vector<char>> vvc;
+typedef std::pair<int, int> pi;
 
 // Overload << for printing vectors
 template <typename T>
@@ -293,14 +297,12 @@ std::vector<T> operator+(const std::vector<T> &arr,
  */
 
 template <typename T>
-T arrValue(const std::vector<std::vector<T>> &arr,
-           const std::array<int, 2> &arr2) {
+T arrValue(std::span<const std::vector<T>> arr, const std::array<int, 2> &arr2) {
   return arr[arr2[0]][arr2[1]];
 }
 
 template <typename T>
-T arrValue(const std::vector<std::vector<T>> &arr,
-           const std::pair<int, int> &arr2) {
+T arrValue(std::span<const std::vector<T>> arr, const pi &arr2) {
   /**
    * @brief Retrieves the value from a 2D vector at a specified row and column
    * index
@@ -321,7 +323,7 @@ T arrValue(const std::vector<std::vector<T>> &arr,
  * @return The value at the specified row and column index in the 2D array
  */
 template <typename T, size_t N, size_t M>
-T arrValue(const T (&arr)[N][M], const std::pair<int, int> &arr2) {
+T arrValue(const T (&arr)[N][M], const pi &arr2) {
   return arr[arr2.first][arr2.second];
 }
 
@@ -334,14 +336,12 @@ T arrValue(const T (&arr)[N][M], const std::pair<int, int> &arr2) {
  * @return The value at the specified row and column index in the 2D array
  */
 template <typename T, size_t N, size_t M>
-T arrValue(const std::array<std::array<T, N>, M> &arr,
-           const std::pair<int, int> &arr2) {
+T arrValue(std::span<const std::array<T, N>, M> arr, const pi &arr2) {
   return arr[arr2.first][arr2.second];
 }
 
 template <typename T>
-bool inBounds(const std::vector<std::vector<T>> &arr,
-              const std::pair<int, int> &pos) {
+bool inBounds(const std::span<const std::vector<T>> arr, const pi &pos) {
   /**
    * @brief Checks if a given pair of indices is within the bounds of a 2D
    * vector
@@ -364,11 +364,13 @@ bool inBounds(const std::vector<std::vector<T>> &arr,
  * otherwise
  */
 
-bool inBounds(const std::pair<int, int> &pos, size_t height, size_t width) {
+bool inBounds(const pi &pos, size_t height, size_t width) {
   return (pos.first >= 0 && pos.second >= 0 &&
           static_cast<size_t>(pos.first) < height &&
           static_cast<size_t>(pos.second) < width);
 }
+
+enum class Direction { Udlr, Diags, All };
 
 template <typename V, std::size_t N>
 struct Nbrs {
@@ -386,51 +388,42 @@ struct Nbrs {
  * neighbors, 'd' for diagonal neighbors, 'a' for all neighbors
  * @return A struct containing the indices and values of the neighbors
  */
-template <typename V, std::size_t N>
-Nbrs<V, N> nbrs(const std::vector<std::vector<V>> &arr,
-                const std::pair<int, int> &loc, char type = 'n') {
-  auto height = arr.size();
-  auto width = arr[0].size();
 
-  std::array<std::pair<int, int>, 8> all = {
+template <typename V, std::size_t N>
+Nbrs<V, N> get_vals(std::span<const std::vector<V>> mat, std::span<pi> arr,
+                    const pi &pos, size_t height, size_t width) {
+  Nbrs<V, N> result;
+ for (size_t idx = 0; idx < arr.size(); ++idx) {
+    const auto& offset = arr[idx];
+    pi tmp = {pos.first + offset.first, pos.second + offset.second};
+    if (inBounds(tmp, height, width)) {
+        result.indices[result.size] = tmp;
+        result.vals[result.size] = arrValue(mat, tmp);
+        ++result.size;
+    }
+}
+  return result;
+}
+
+template <typename V, std::size_t N>
+Nbrs<V, N> nbrs(std::span<const std::vector<V>> mat, const pi &pos, Direction type) {
+  auto height = mat.size();
+  auto width = mat[0].size();
+
+  std::array<pi, 8> all = {
       {{-1, -1}, {-1, 0}, {-1, 1}, {0, -1}, {0, 1}, {1, -1}, {1, 0}, {1, 1}}};
-  std::array<std::pair<int, int>, 4> diag = {
+  std::array<pi, 4> diags = {
       {{-1, -1}, {-1, 1}, {1, -1}, {1, 1}}};
-  std::array<std::pair<int, int>, 4> lrup = {
+  std::array<pi, 4> lrup = {
       {{-1, 0}, {0, -1}, {0, 1}, {1, 0}}};
 
   Nbrs<V, N> result;
-
-  if (type == 'n') {
-    for (const auto &i : lrup) {
-      std::pair<int, int> tmp = {loc.first + i.first, loc.second + i.second};
-      if (inBounds(tmp, height, width)) {
-        result.indices[result.size] = tmp;
-        result.vals[result.size] = arrValue(arr, tmp);
-        result.size++;
-      }
-    }
-  }
-  if (type == 'd') {
-    for (const auto &i : diag) {
-      std::pair<int, int> tmp = {loc.first + i.first, loc.second + i.second};
-      if (inBounds(tmp, height, width)) {
-        result.indices[result.size] = tmp;
-        result.vals[result.size] = arrValue(arr, tmp);
-        result.size++;
-      }
-    }
-  }
-  if (type == 'a') {
-    for (const auto &i : all) {
-      std::pair<int, int> tmp = {loc.first + i.first, loc.second + i.second};
-      ;
-      if (inBounds(tmp, height, width)) {
-        result.indices[result.size] = tmp;
-        result.vals[result.size] = arrValue(arr, tmp);
-        result.size++;
-      }
-    }
+  if (type == Direction::All) {
+    result = get_vals<V, N>(mat, all, pos, height, width);
+  } else if (type == Direction::Diags) {
+    result = get_vals<V, N>(mat, diags, pos, height, width);
+  } else if (type == Direction::Udlr) {
+    result = get_vals<V, N>(mat, lrup, pos, height, width);
   }
 
   return result;
