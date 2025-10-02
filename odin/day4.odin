@@ -22,6 +22,33 @@ main :: proc() {
 	else do fmt.println("Bad File Path")
 }
 
+DIRS: [][2]int : {
+	{-3, -3},
+	{-2, -2},
+	{-1, -1},
+	{-3, 3},
+	{-2, 2},
+	{-1, 1},
+	{3, -3},
+	{2, -2},
+	{1, -1},
+	{3, 3},
+	{2, 2},
+	{1, 1},
+	{-3, 0},
+	{-2, 0},
+	{-1, 0},
+	{3, 0},
+	{2, 0},
+	{1, 0},
+	{0, -3},
+	{0, -2},
+	{0, -1},
+	{0, 3},
+	{0, 2},
+	{0, 1},
+}
+
 solution :: proc(filepath: string) -> (pt1, pt2: u32, ok: bool) {
 	data := os.read_entire_file(filepath) or_return
 	it := string(data)
@@ -39,78 +66,42 @@ solution :: proc(filepath: string) -> (pt1, pt2: u32, ok: bool) {
 
 checkXmas :: proc(mat: [][]rune) -> (ttl: u32) {
 	width, height := len(mat[0]), len(mat)
-	dirs: [][2]int = {
-		{-3, -3},
-		{-2, -2},
-		{-1, -1},
-		{-3, 3},
-		{-2, 2},
-		{-1, 1},
-		{3, -3},
-		{2, -2},
-		{1, -1},
-		{3, 3},
-		{2, 2},
-		{1, 1},
-		{-3, 0},
-		{-2, 0},
-		{-1, 0},
-		{3, 0},
-		{2, 0},
-		{1, 0},
-		{0, -3},
-		{0, -2},
-		{0, -1},
-		{0, 3},
-		{0, 2},
-		{0, 1},
-	}
 
-	valid_inds: [dynamic][2]int
 	for r_val, r_ind in mat {
 		for c_val, c_ind in r_val {
-			tmp: [2]int = {r_ind, c_ind}
-			if c_val == 'X' do append(&valid_inds, tmp)
+			if c_val != 'X' do continue
+			str: sa.Small_Array(4, rune)
+			group := 0
+			for val in DIRS {
+				tmp: [2]int = {val.x, val.y} + {r_ind, c_ind}
+				if (tmp.x >= 0 && tmp.x < height) &&
+				   (tmp.y >= 0 && tmp.y < width) {
+					sa.append(&str, rune(mat[tmp.x][tmp.y]))
+				}
+				group += 1
+				if group == 3 {
+					sa.append(&str, 'X')
+					s := utf8.runes_to_string(sa.slice(&str))
+					if s == "XMAS" || s == "SAMX" do ttl += 1
+					sa.clear(&str)
+					group = 0
+				}
+			}
 		}
 	}
 
-	cnt := 0
-	for v in valid_inds {
-		str: sa.Small_Array(4, rune)
-		for val in dirs {
-			cnt += 1
-			tmp: [2]int = {val.x, val.y} + v
-			if (tmp.x >= 0 && tmp.x < height) &&
-			   (tmp.y >= 0 && tmp.y < width) {
-				sa.append(&str, rune(mat[tmp.x][tmp.y]))
-			}
-			if cnt % 3 == 0 {
-				sa.append(&str, 'X')
-				s := utf8.runes_to_string(sa.slice(&str))
-				if s == "XMAS" || s == "SAMX" do ttl += 1
-				sa.clear(&str)
-			}
-		}
-	}
 	return
 }
 
 checkX :: proc(mat: [][]rune) -> (ttl: u32) {
-	valid_inds := make([dynamic][2]int)
 	for r_val, r_ind in mat {
 		for c_val, c_ind in r_val {
-			if c_val == 'A' {
-				append(&valid_inds, ([2]int){r_ind, c_ind})
-			}
-		}
-	}
-
-	for i in valid_inds {
-		_, vals := Tools.nbrs(mat[:], [2]int{i.x, i.y}, .Diags)
-		tmp := utf8.runes_to_string(sa.slice(&vals))
-		if tmp == "MMSS" || tmp == "SSMM" || tmp == "SMSM" || tmp == "MSMS" {
-			ttl += 1
+			if c_val != 'A' do continue
+			_, vals := Tools.nbrs(mat, [2]int{r_ind, c_ind}, .Diags)
+			tmp := utf8.runes_to_string(sa.slice(&vals))
+			if tmp == "MMSS" || tmp == "SSMM" || tmp == "SMSM" || tmp == "MSMS" do ttl += 1
 		}
 	}
 	return
 }
+
