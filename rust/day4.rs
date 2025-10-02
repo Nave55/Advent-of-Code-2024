@@ -2,6 +2,33 @@ fn main() {
     solution()
 }
 
+const DIR: [(i32, i32); 24] = [
+    (-3, -3),
+    (-2, -2),
+    (-1, -1),
+    (-3, 3),
+    (-2, 2),
+    (-1, 1),
+    (3, -3),
+    (2, -2),
+    (1, -1),
+    (3, 3),
+    (2, 2),
+    (1, 1),
+    (-3, 0),
+    (-2, 0),
+    (-1, 0),
+    (3, 0),
+    (2, 0),
+    (1, 0),
+    (0, -3),
+    (0, -2),
+    (0, -1),
+    (0, 3),
+    (0, 2),
+    (0, 1),
+];
+
 fn solution() {
     let con = std::fs::read_to_string("../inputs/day4.txt").expect("Bad File Name");
 
@@ -16,82 +43,44 @@ fn solution() {
     println!("Part 1: {pt1}\nPart 2: {pt2}")
 }
 
-fn check_xmas(mat: &Vec<Vec<char>>) -> i32 {
-    let dir: [(i32, i32); 24] = [
-        (-3, -3),
-        (-2, -2),
-        (-1, -1),
-        (-3, 3),
-        (-2, 2),
-        (-1, 1),
-        (3, -3),
-        (2, -2),
-        (1, -1),
-        (3, 3),
-        (2, 2),
-        (1, 1),
-        (-3, 0),
-        (-2, 0),
-        (-1, 0),
-        (3, 0),
-        (2, 0),
-        (1, 0),
-        (0, -3),
-        (0, -2),
-        (0, -1),
-        (0, 3),
-        (0, 2),
-        (0, 1),
-    ];
-
-    let valid_inds: Vec<Vec<i32>> = mat
-        .iter()
+fn check_xmas(mat: &[Vec<char>]) -> i32 {
+    mat.iter()
         .enumerate()
-        .flat_map(|(r_ind, r_vals)| {
-            r_vals
-                .iter()
-                .enumerate()
-                .filter_map(|(c_ind, &c_val)| {
-                    let tmp = vec![r_ind as i32, c_ind as i32];
-                    if c_val == 'X' {
-                        Some(tmp)
-                    } else {
-                        None
-                    }
-                })
-                .collect::<Vec<Vec<i32>>>()
+        .flat_map(|(r, row)| {
+            row.iter().enumerate().filter_map(move |(c, &ch)| {
+                if ch == 'X' {
+                    Some((r as i32, c as i32))
+                } else {
+                    None
+                }
+            })
         })
-        .collect();
-
-    valid_inds
-        .iter()
-        .flat_map(|v| {
-            dir.iter()
-                .filter_map(|&(x, y)| {
-                    let tmp = [v[0] + x, v[1] + y];
-                    mat.get(tmp[0] as usize)
-                        .and_then(|row| row.get(tmp[1] as usize))
+        .flat_map(|(x, y)| {
+            DIR.iter()
+                .scan(Vec::with_capacity(3), move |buf, &(dx, dy)| {
+                    let nx = x + dx;
+                    let ny = y + dy;
+                    let ch = mat
+                        .get(nx as usize)
+                        .and_then(|row| row.get(ny as usize))
                         .copied()
-                        .or(Some('0'))
-                })
-                .collect::<Vec<char>>()
-                .chunks(3)
-                .filter_map(|chunk| {
-                    if chunk == ['S', 'A', 'M'] {
-                        Some(1)
+                        .unwrap_or('0');
+                    buf.push(ch);
+                    if buf.len() == 3 {
+                        let chunk = std::mem::take(buf);
+                        Some(Some(chunk))
                     } else {
-                        None
+                        Some(None)
                     }
                 })
-                .collect::<Vec<i32>>()
+                .filter_map(|opt_chunk| opt_chunk)
+                .filter(|chunk| chunk == &['S', 'A', 'M'])
+                .map(|_| 1)
         })
-        .sum::<i32>()
+        .sum()
 }
 
-fn get_diags<T>(mat: &Vec<Vec<T>>, loc: [i32; 2]) -> Vec<T>
-where
-    T: Copy,
-{
+fn get_diags<T: Copy>(mat: &[Vec<T>], loc: [i32; 2]) -> Vec<T> {
     let dir: [(i32, i32); 4] = [(-1, -1), (-1, 1), (1, -1), (1, 1)];
 
     dir.iter()
@@ -109,35 +98,25 @@ where
         .collect()
 }
 
-fn check_x(mat: &Vec<Vec<char>>) -> i32 {
-    let valid_inds: Vec<Vec<i32>> = mat
-        .iter()
+fn check_x(mat: &[Vec<char>]) -> i32 {
+    mat.iter()
         .enumerate()
-        .flat_map(|(r_ind, r_vals)| {
-            r_vals
-                .iter()
-                .enumerate()
-                .filter_map(|(c_ind, &c_val)| {
-                    let tmp = vec![r_ind as i32, c_ind as i32];
-                    if c_val == 'A' {
-                        Some(tmp)
-                    } else {
-                        None
-                    }
-                })
-                .collect::<Vec<Vec<i32>>>()
+        .flat_map(|(r, row)| {
+            row.iter().enumerate().filter_map(move |(c, &ch)| {
+                if ch == 'A' {
+                    Some((r as i32, c as i32))
+                } else {
+                    None
+                }
+            })
         })
-        .collect();
-
-    valid_inds
-        .iter()
-        .filter_map(|i| {
-            let vals: &str = &get_diags(mat, [i[0], i[1]]).iter().collect::<String>();
-            if ["MMSS", "SSMM", "SMSM", "MSMS"].contains(&vals) {
+        .filter_map(|(x, y)| {
+            let vals: String = get_diags(mat, [x, y]).iter().collect();
+            if matches!(vals.as_str(), "MMSS" | "SSMM" | "SMSM" | "MSMS") {
                 Some(1)
             } else {
                 None
             }
         })
-        .sum::<i32>()
+        .sum()
 }
