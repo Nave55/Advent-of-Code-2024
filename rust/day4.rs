@@ -1,3 +1,5 @@
+use tools::{nbrs, Dirs};
+
 fn main() {
     solution()
 }
@@ -80,24 +82,6 @@ fn check_xmas(mat: &[Vec<char>]) -> i32 {
         .sum()
 }
 
-fn get_diags<T: Copy>(mat: &[Vec<T>], loc: [i32; 2]) -> Vec<T> {
-    let dir: [(i32, i32); 4] = [(-1, -1), (-1, 1), (1, -1), (1, 1)];
-
-    dir.iter()
-        .filter_map(|&(dx, dy)| {
-            let new_x = loc[0] + dx;
-            let new_y = loc[1] + dy;
-            if new_x >= 0 && new_x < mat.len() as i32 && new_y >= 0 && new_y < mat[0].len() as i32 {
-                mat.get(new_x as usize)
-                    .and_then(|row| row.get(new_y as usize))
-                    .copied()
-            } else {
-                None
-            }
-        })
-        .collect()
-}
-
 fn check_x(mat: &[Vec<char>]) -> i32 {
     mat.iter()
         .enumerate()
@@ -111,12 +95,13 @@ fn check_x(mat: &[Vec<char>]) -> i32 {
             })
         })
         .filter_map(|(x, y)| {
-            let vals: String = get_diags(mat, [x, y]).iter().collect();
-            if matches!(vals.as_str(), "MMSS" | "SSMM" | "SMSM" | "MSMS") {
-                Some(1)
-            } else {
-                None
-            }
+            nbrs(mat, (x, y), Dirs::Diags).and_then(|(_, vals)| {
+                matches!(
+                    vals.iter().collect::<String>().as_str(),
+                    "MMSS" | "SSMM" | "SMSM" | "MSMS"
+                )
+                .then_some(1)
+            })
         })
         .sum()
 }
