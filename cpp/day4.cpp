@@ -5,40 +5,33 @@
 
 using PI = std::pair<int, int>;
 
+std::array<PI, 24> dirs = {
+    {{-3, -3}, {-2, -2}, {-1, -1}, {-3, 3}, {-2, 2}, {-1, 1}, {3, -3}, {2, -2},
+     {1, -1},  {3, 3},   {2, 2},   {1, 1},  {-3, 0}, {-2, 0}, {-1, 0}, {3, 0},
+     {2, 0},   {1, 0},   {0, -3},  {0, -2}, {0, -1}, {0, 3},  {0, 2},  {0, 1}}};
+
 auto checkXmas(const std::vector<vs> &mat) -> int {
-  auto width = mat[0].size();
-  auto height = mat.size();
+  auto width = (int)mat[0].size();
+  auto height = (int)mat.size();
+  int ttl = 0;
 
-  std::array<PI, 24> dirs = {{{-3, -3}, {-2, -2}, {-1, -1}, {-3, 3}, {-2, 2},
-                              {-1, 1},  {3, -3},  {2, -2},  {1, -1}, {3, 3},
-                              {2, 2},   {1, 1},   {-3, 0},  {-2, 0}, {-1, 0},
-                              {3, 0},   {2, 0},   {1, 0},   {0, -3}, {0, -2},
-                              {0, -1},  {0, 3},   {0, 2},   {0, 1}}};
-
-  std::vector<PI> valid_inds;
-  for (size_t i = 0; i < height; i++) {
-    for (size_t j = 0; j < width; j++) {
-      PI tmp = {(int)i, (int)j};
-      if (mat[i][j] == "X") {
-        valid_inds.emplace_back(tmp);
-      }
-    }
-  }
-
-  auto ttl = 0, cnt = 0;
-  for (const auto &v : valid_inds) {
-    std::string str{};
-    for (const auto &val : dirs) {
-      cnt++;
-      auto tmp = val + v;
-      if (tmp.first >= 0 && (size_t)tmp.first < height && tmp.second >= 0 &&
-          (size_t)tmp.second < width) {
-        str += mat[tmp.first][tmp.second];
-      }
-      if (cnt % 3 == 0) {
-        str += "X";
-        if (str == "XMAS" || str == "SAMX") ttl++;
-        str = "";
+  for (int i = 0; i < height; i++) {
+    for (int j = 0; j < width; j++) {
+      if (mat[i][j] != "X") continue;
+      std::string str;
+      int cnt = 0;
+      for (const auto &val : dirs) {
+        cnt++;
+        auto tmp = val + std::make_pair(i, j);
+        if (tmp.first >= 0 && tmp.first < height && tmp.second >= 0 &&
+            tmp.second < width) {
+          str += mat[tmp.first][tmp.second];
+        }
+        if (cnt % 3 == 0) {
+          str += "X";
+          if (str == "XMAS" || str == "SAMX") ttl++;
+          str = "";
+        }
       }
     }
   }
@@ -47,22 +40,17 @@ auto checkXmas(const std::vector<vs> &mat) -> int {
 }
 
 auto checkX(const std::vector<vs> &mat) -> int {
-  std::vector<PI> valid_inds;
+  int ttl = 0;
   for (size_t i = 0; i < mat.size(); i++) {
     for (size_t j = 0; j < mat[0].size(); j++) {
-      PI tmp = {(int)i, (int)j};
-      if (mat[i][j] == "A") {
-        valid_inds.emplace_back(tmp);
-      }
+      if (mat[i][j] != "A") continue;
+      auto n = nbrs<std::string, 4>(mat, {i, j}, 'd');
+      auto tmp = tJoin(n.vals);
+      if (tmp == "MMSS" || tmp == "SSMM" || tmp == "SMSM" || tmp == "MSMS")
+        ttl++;
     }
   }
 
-  auto ttl = 0;
-  for (const auto &v : valid_inds) {
-    auto n = nbrs<std::string, 4>(mat, v, 'd');
-    auto tmp = tJoin(n.vals);
-    if (tmp == "MMSS" || tmp == "SSMM" || tmp == "SMSM" || tmp == "MSMS") ttl++;
-  }
   return ttl;
 }
 
@@ -78,7 +66,7 @@ auto solution() -> void {
     arr.emplace_back(a);
   }
 
-  printf("Part 1: %d\nPart 2: %d", checkXmas(arr), checkX(arr));
+  printf("Part 1: %d\nPart 2: %d\n", checkXmas(arr), checkX(arr));
 }
 
 auto main() -> int {
