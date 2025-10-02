@@ -3,14 +3,12 @@
 #include <utility>
 #include "tools.h"
 
-using PI = std::pair<int, int>;
-
-std::array<PI, 24> dirs = {
+std::array<pi, 24> dirs = {
     {{-3, -3}, {-2, -2}, {-1, -1}, {-3, 3}, {-2, 2}, {-1, 1}, {3, -3}, {2, -2},
      {1, -1},  {3, 3},   {2, 2},   {1, 1},  {-3, 0}, {-2, 0}, {-1, 0}, {3, 0},
      {2, 0},   {1, 0},   {0, -3},  {0, -2}, {0, -1}, {0, 3},  {0, 2},  {0, 1}}};
 
-auto checkXmas(const std::vector<vs> &mat) -> int {
+auto checkXmas(const vvs &mat) -> int {
   auto width = (int)mat[0].size();
   auto height = (int)mat.size();
   int ttl = 0;
@@ -19,7 +17,7 @@ auto checkXmas(const std::vector<vs> &mat) -> int {
     for (int j = 0; j < width; j++) {
       if (mat[i][j] != "X") continue;
       std::string str;
-      int cnt = 0;
+      int cnt = 0; 
       for (const auto &val : dirs) {
         cnt++;
         auto tmp = val + std::make_pair(i, j);
@@ -39,12 +37,12 @@ auto checkXmas(const std::vector<vs> &mat) -> int {
   return ttl;
 }
 
-auto checkX(const std::vector<vs> &mat) -> int {
+auto checkX(const vvs &mat) -> int {
   int ttl = 0;
   for (size_t i = 0; i < mat.size(); i++) {
     for (size_t j = 0; j < mat[0].size(); j++) {
       if (mat[i][j] != "A") continue;
-      auto n = nbrs<std::string, 4>(mat, {i, j}, 'd');
+      auto n = nbrs<std::string, 4>(mat, {i, j}, Direction::Diags);
       auto tmp = tJoin(n.vals);
       if (tmp == "MMSS" || tmp == "SSMM" || tmp == "SMSM" || tmp == "MSMS")
         ttl++;
