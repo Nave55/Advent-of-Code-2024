@@ -379,16 +379,6 @@ struct Nbrs {
   std::size_t size = 0;  // To keep track of actual filled elements
 };
 
-/**
- * @brief Finds the neighbors of a given location in a 2D vector
- *
- * @param arr The 2D vector to search for neighbors
- * @param loc The location to search for neighbors
- * @param type The type of neighbors to search for. 'n' for non-diagonal
- * neighbors, 'd' for diagonal neighbors, 'a' for all neighbors
- * @return A struct containing the indices and values of the neighbors
- */
-
 template <typename V, std::size_t N>
 Nbrs<V, N> get_vals(std::span<const std::vector<V>> mat, std::span<pi> arr,
                     const pi &pos, size_t height, size_t width) {
@@ -404,6 +394,16 @@ Nbrs<V, N> get_vals(std::span<const std::vector<V>> mat, std::span<pi> arr,
 }
   return result;
 }
+
+/**
+ * @brief Finds the neighbors of a given location in a 2D vector
+ *
+ * @param arr The 2D vector to search for neighbors
+ * @param loc The location to search for neighbors
+ * @param type The type of neighbors to search for. 'n' for non-diagonal
+ * neighbors, 'd' for diagonal neighbors, 'a' for all neighbors
+ * @return A struct containing the indices and values of the neighbors
+ */
 
 template <typename V, std::size_t N>
 Nbrs<V, N> nbrs(std::span<const std::vector<V>> mat, const pi &pos, Direction type) {
@@ -477,3 +477,4 @@ struct pair_hash {
     return h1 ^ (h2 * 31);  // Use a prime multiplier
   }
 };
+
