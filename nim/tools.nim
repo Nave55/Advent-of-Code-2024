@@ -2,10 +2,10 @@ import Tables, strformat, strutils, sequtils
 
 type 
     TI = tuple[x, y: int]
-    HTSTI = Table[TI, seq[TI]]
-    HCSTI = Table[char, seq[TI]]
-    SC = seq[char]
-    SSC = seq[SC]
+    # HTSTI = Table[TI, seq[TI]]
+    # HCSTI = Table[char, seq[TI]]
+    # SC = seq[char]
+    # SSC = seq[SC]
 
 func `+`* [T](a: seq[T], b: seq[T]): seq[T] =
     var c: seq[T] = @[];
@@ -13,8 +13,8 @@ func `+`* [T](a: seq[T], b: seq[T]): seq[T] =
         c.add(a[i] + b[i])
     return c
     
-func arrValue*[T](arr: seq[seq[T]], ind: seq[int]): T =
-    return arr[ind[0]][ind[1]]
+func arrValue*[T](arr: seq[seq[T]], pos: TI): T =
+    return arr[pos.x][pos.y]
 
 func `+`* (a, b: TI): TI =
   return (a.x + b.x, a.y + b.y) 
@@ -35,17 +35,20 @@ func strToTup*(str: string): TI =
     let tmp = str.split(",").mapIt(parseInt(it))
     return (tmp[0], tmp[1])
 
+type Dirs* = enum
+  diags, all, udlr
+
 func inBounds*(tup: TI, width, height: int): bool =
   return (tup.x >= 0 and tup.x < height) and (tup.y >= 0 and tup.y < width)  
 
 func fetchVal*[T](mat: seq[seq[T]], tup: TI): T =
   return mat[tup.x][tup.y]
 
-func nbrs*[T](arr: seq[seq[T]], loc: TI, md: char = 'n'): (seq[TI], seq[T]) =
+func nbrs*[T](arr: seq[seq[T]], loc: TI, md: Dirs): (seq[TI], seq[T]) =
     var dir: seq[TI]
-    if md == 'n': dir = @[(-1, 0), (0, -1), (0, 1), (1, 0)]
-    elif md == 'b': dir = @[(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)]
-    elif md == 'd': dir = @[(-1, -1), (-1, 1), (1, -1), (1, 1)]
+    if md == udlr: dir = @[(-1, 0), (1, 0), (0, -1), (0, 1)]
+    elif md == all: dir = @[(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)]
+    elif md == diags: dir = @[(-1, -1), (-1, 1), (1, -1), (1, 1)]
     for i in dir:
         let tmp = loc + i
         if inBounds(tmp, arr[0].len(), arr.len()):
