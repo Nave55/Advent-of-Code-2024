@@ -1,40 +1,82 @@
 package tools
 
+import sa "core:container/small_array"
+import "core:fmt"
+import "core:os"
+import "core:strconv"
+import "core:strings"
 import "core:text/regex"
 import "core:unicode/utf8"
 
-arrValue :: proc(arr: ^$T, arr2: [2]int, $R: typeid) -> R {
-	return R(arr[arr2.x][arr2.y])
+Dirs :: enum {
+	Udlr,
+	Diags,
+	All,
+}
+
+inbounds :: proc(mat: [][]$T, pos: [2]int) -> bool {
+	return pos.x >= 0 && pos.x < len(mat) && pos.y >= 0 && pos.y < len(mat[0])
+}
+
+arrValue :: proc(mat: [][]$T, pos: [2]int) -> T {
+	return mat[pos.x][pos.y]
+}
+
+getDirs :: proc(
+	mat: [][]$T,
+	arr: [][2]int,
+	pos: [2]int,
+) -> (
+	inds: sa.Small_Array(8, [2]int),
+	vals: sa.Small_Array(8, T),
+) {
+
+	for i in arr {
+		n_pos := i + pos
+		if inbounds(mat, n_pos) {
+			sa.append(&inds, n_pos)
+			sa.append(&vals, arrValue(mat, n_pos))
+		}
+	}
+
+	return
 }
 
 nbrs :: proc(
-	arr: ^$T,
-	loc: [2]int,
-	$N: int,
-	$F: bool,
-	$R: typeid,
+	mat: [][]$T,
+	pos: [2]int,
+	dirs: Dirs,
 ) -> (
-	indices: [N][2]int,
-	vals: [N]R,
+	inds: sa.Small_Array(8, [2]int),
+	vals: sa.Small_Array(8, T),
 ) {
-	assert(N == 4 || N == 8, "N must be 4 or 8")
-
-	dir: [N][2]int
-	when N == 4 && F == false do dir = {{-1, 0}, {0, -1}, {0, 1}, {1, 0}}
-	when N == 4 && F == true do dir = {{-1, -1}, {-1, 1}, {1, -1}, {1, 1}}
-	when N == 8 do dir = {{-1, -1}, {-1, 0}, {-1, 1}, {0, -1}, {0, 1}, {1, -1}, {1, 0}, {1, 1}}
-	for i, ind in dir {
-		tmp := loc + i
-		if tmp[0] != -1 && tmp[1] != -1 && tmp[0] < len(arr) && tmp[1] < len(arr[0]) {
-			indices[ind] = tmp
-			vals[ind] = arrValue(arr, tmp, R)
-		}
+	udlr := [][2]int{{-1, 0}, {1, 0}, {0, -1}, {0, 1}}
+	diags := [][2]int{{-1, -1}, {-1, 1}, {1, -1}, {1, 1}}
+	all := [][2]int {
+		{-1, -1},
+		{-1, 0},
+		{-1, 1},
+		{0, -1},
+		{0, 1},
+		{1, -1},
+		{1, 0},
+		{1, 1},
 	}
+
+	switch dirs {
+	case .All:
+		return getDirs(mat, all[:], pos)
+	case .Udlr:
+		return getDirs(mat, udlr[:], pos)
+	case .Diags:
+		return getDirs(mat, diags[:], pos)
+	}
+
 	return
 }
 
 regexFind :: proc(str, pattern: string, slide: int = 1) -> (arr: [dynamic]regex.Capture) {
-	re, _ := regex.create(pattern, {.Global}, context.temp_allocator)
+	re, _ := regex.create(pattern, {.No_Optimization}, context.temp_allocator)
 
 	ind := 0
 	for ind < len(str) {
@@ -44,9 +86,11 @@ regexFind :: proc(str, pattern: string, slide: int = 1) -> (arr: [dynamic]regex.
 			append(&arr, res)
 		} else do ind += slide
 	}
+	
 	return
 }
 
 inBounds :: proc(pos: [2]$T, width, height: T) -> bool {
 	return (pos.x >= 0 && pos.x < height && pos.y >= 0 && pos.y < width)
 }
+
