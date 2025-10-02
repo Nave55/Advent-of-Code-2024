@@ -1,5 +1,5 @@
 import os
-import tools { Vec2, arr_value, in_bounds, nbrs }
+import tools as t
 
 fn main() {
 	pt1, pt2 := solution()!
@@ -22,82 +22,75 @@ fn check_xmas(mat [][]rune) int {
 	height := mat.len
 
 	dirs := [
-		Vec2[int]{-3, -3},
-		Vec2[int]{-2, -2},
-		Vec2[int]{-1, -1},
-		Vec2[int]{-3, 3},
-		Vec2[int]{-2, 2},
-		Vec2[int]{-1, 1},
-		Vec2[int]{3, -3},
-		Vec2[int]{2, -2},
-		Vec2[int]{1, -1},
-		Vec2[int]{3, 3},
-		Vec2[int]{2, 2},
-		Vec2[int]{1, 1},
-		Vec2[int]{-3, 0},
-		Vec2[int]{-2, 0},
-		Vec2[int]{-1, 0},
-		Vec2[int]{3, 0},
-		Vec2[int]{2, 0},
-		Vec2[int]{1, 0},
-		Vec2[int]{0, -3},
-		Vec2[int]{0, -2},
-		Vec2[int]{0, -1},
-		Vec2[int]{0, 3},
-		Vec2[int]{0, 2},
-		Vec2[int]{0, 1},
+		t.Vec2[int]{-3, -3},
+		t.Vec2{-2, -2},
+		t.Vec2{-1, -1},
+		t.Vec2{-3, 3},
+		t.Vec2{-2, 2},
+		t.Vec2{-1, 1},
+		t.Vec2{3, -3},
+		t.Vec2{2, -2},
+		t.Vec2{1, -1},
+		t.Vec2{3, 3},
+		t.Vec2{2, 2},
+		t.Vec2{1, 1},
+		t.Vec2{-3, 0},
+		t.Vec2{-2, 0},
+		t.Vec2{-1, 0},
+		t.Vec2{3, 0},
+		t.Vec2{2, 0},
+		t.Vec2{1, 0},
+		t.Vec2{0, -3},
+		t.Vec2{0, -2},
+		t.Vec2{0, -1},
+		t.Vec2{0, 3},
+		t.Vec2{0, 2},
+		t.Vec2{0, 1},
 	]
 
-	mut valid_inds := []Vec2[int]{}
+	mut ttl := 0
 	for r_ind, r_val in mat {
 		for c_ind, c_val in r_val {
-			if c_val == `X` {
-				tmp := Vec2{r_ind, c_ind}
-				valid_inds << tmp
+			if c_val != `X` {
+				continue
+			}
+			mut str := []rune{}
+			mut cnt := 0
+			for val in dirs {
+				cnt++
+				tmp := val + t.Vec2{r_ind, c_ind}
+				if t.in_bounds(tmp, height, width) {
+					str << rune(t.arr_value(mat, tmp))
+				}
+				if cnt % 3 == 0 {
+					str << `X`
+					s := str.string()
+					if s == 'XMAS' || s == 'SAMX' {
+						ttl += 1
+					}
+					str.clear()
+				}
 			}
 		}
 	}
 
-	mut ttl := int(0)
-	mut cnt := 0
-	for v in valid_inds {
-		mut str := []rune{}
-		for val in dirs {
-			cnt++
-			tmp := val + v
-			if in_bounds(tmp, height, width) {
-				str << rune(arr_value(mat, tmp))
-			}
-			if cnt % 3 == 0 {
-				str << `X`
-				s := str.string()
-				if s == 'XMAS' || s == 'SAMX' {
-					ttl += 1
-				}
-				str.clear()
-			}
-		}
-	}
 	return ttl
 }
 
 fn check_x(mat [][]rune) int {
 	mut ttl := int(0)
-	mut valid_inds := []Vec2[int]{}
 	for r_ind, r_val in mat {
 		for c_ind, c_val in r_val {
-			if c_val == `A` {
-				valid_inds << Vec2[int]{r_ind, c_ind}
+			if c_val != `A` {
+				continue
+			}
+			_, vals := t.nbrs(mat, t.Vec2{r_ind, c_ind}, `d`)
+			tmp := vals.string()
+			if tmp in ['MMSS', 'SSMM', 'SMSM', 'MSMS'] {
+				ttl++
 			}
 		}
 	}
 
-	for i in valid_inds {
-		_, vals := nbrs(mat, i, `d`)
-		tmp := vals.string()
-		if tmp in ['MMSS', 'SSMM', 'SMSM', 'MSMS'] {
-			ttl++
-		}
-	}
 	return ttl
 }
