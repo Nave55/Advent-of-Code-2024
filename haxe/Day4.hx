@@ -53,7 +53,7 @@ class Day4 {
         for (r_ind => r_val in mat) {
             for (c_ind => c_val in r_val) {
                 if (c_val != 'A') continue;
-                var vals = nbrs(mat, {x: r_ind, y: c_ind}, "diag").vals.map(item -> item.toString()).join("");
+                var vals = nbrs(mat, {x: r_ind, y: c_ind}, diags).vals.map(item -> item.toString()).join("");
                 if (["MMSS", "SSMM", "SMSM", "MSMS"].contains(vals)) ttl++;
             }
         }
