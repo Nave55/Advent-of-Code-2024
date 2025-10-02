@@ -17,13 +17,14 @@ main :: proc() {
 	context.allocator = arena_allocator
 	defer vm.arena_destroy(&arena)
 
-	solution("input/day4.txt")
+	pt1, pt2, ok := solution("input/day4.txt")
+	if ok do fmt.printfln("Part 1: %v\nPart 2: %v", pt1, pt2)
+	else do fmt.println("Bad File Path")
 }
 
-solution :: proc(filepath: string) {
+solution :: proc(filepath: string) -> (pt1, pt2: u32, ok: bool) {
 	arr: [dynamic][]rune
-	data, ok := os.read_entire_file(filepath)
-	if !ok do return
+	data := os.read_entire_file(filepath) or_return
 	it := string(data)
 
 	for line in strings.split_lines_iterator(&it) {
@@ -31,9 +32,7 @@ solution :: proc(filepath: string) {
 		append(&arr, tmp)
 	}
 
-	pt1 := checkXmas(arr[:])
-	pt2 := checkX(arr[:])
-	fmt.printfln("Part 1: %v\nPart 2: %v", pt1, pt2)
+	return checkXmas(arr[:]), checkX(arr[:]), true
 }
 
 checkXmas :: proc(mat: [][]rune) -> (ttl: u32) {
@@ -83,7 +82,7 @@ checkXmas :: proc(mat: [][]rune) -> (ttl: u32) {
 			   (tmp.y >= 0 && tmp.y < width) {
 				sa.append(&str, rune(mat[tmp.x][tmp.y]))
 			}
-			if cnt %% 3 == 0 {
+			if cnt % 3 == 0 {
 				sa.append(&str, 'X')
 				s := utf8.runes_to_string(sa.slice(&str))
 				if s == "XMAS" || s == "SAMX" do ttl += 1
@@ -105,7 +104,7 @@ checkX :: proc(mat: [][]rune) -> (ttl: u32) {
 	}
 
 	for i in valid_inds {
-		_, vals := Tools.nbrs(mat[:], ([2]int){i.x, i.y}, .Diags)
+		_, vals := Tools.nbrs(mat[:], [2]int{i.x, i.y}, .Diags)
 		tmp := utf8.runes_to_string(sa.slice(&vals))
 		if tmp == "MMSS" || tmp == "SSMM" || tmp == "SMSM" || tmp == "MSMS" {
 			ttl += 1
@@ -113,4 +112,3 @@ checkX :: proc(mat: [][]rune) -> (ttl: u32) {
 	}
 	return
 }
-
