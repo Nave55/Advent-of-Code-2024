@@ -84,7 +84,7 @@ fn check_x(mat [][]rune) int {
 			if c_val != `A` {
 				continue
 			}
-			_, vals := t.nbrs(mat, t.Vec2{r_ind, c_ind}, `d`)
+			_, vals := t.nbrs(mat, t.Vec2{r_ind, c_ind}, t.Dirs.diags)
 			tmp := vals.string()
 			if tmp in ['MMSS', 'SSMM', 'SMSM', 'MSMS'] {
 				ttl++
