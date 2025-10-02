@@ -1,3 +1,4 @@
+import haxe.macro.Type.AnonType;
 import haxe.macro.Expr;
 import haxe.Int64;
 import hx.strings.Char;
@@ -36,39 +37,6 @@ typedef MI64 = Map<Int,    Int64>;
 typedef MS64 = Map<String, Int64>;
 
 /**
- * [String Iterator]
- 
-    Example:
-
-        var str = "esbzops qjh qfo";
-
-        for (i in new StringIterator(str, true)) {
-            trace(i);       
-        }
-
-@param str String
-@param lower Bool
-@return String
-*/
-
-class StringIterator {
-    var str: String;
-    var end: Int;
-    var i: Int;
-  
-    public inline function new(str: String, lower: Bool = false) {
-        lower == true ? this.str = str.toLowerCase() : this.str = str;
-        this.i = 0;
-        this.end = str.length;
-    }
-  
-    public inline function hasNext() return i < end;
-    public inline function next() {
-        return str.charAt(i++);
-    } 
-}
-
-/**
  * [Reverse Iterator]
  
     Example:
@@ -79,9 +47,9 @@ class StringIterator {
             trace(i);       
         }
 
-@param start Start
-@param end End
-@return Int
+@param a Start
+@param b End
+@return No return value
 */
 
 class ReverseIterator {
@@ -95,7 +63,7 @@ class ReverseIterator {
   
     public inline function hasNext() return i >= end;
     public inline function next() return i--;
-}
+  }
 
 /**
  * [Swaps two variables]
@@ -237,6 +205,12 @@ inline function arrValue<T>(arr: Array<Array<T>>, arr2: AI) {
     return arr[arr2[0]][arr2[1]];
 }
 
+enum Dirs {
+    all;
+    diags;
+    udlr;
+}
+
 /**
  * [Get list of neighbor indices and values in a 2d array.]
  
@@ -254,13 +228,13 @@ inline function arrValue<T>(arr: Array<Array<T>>, arr2: AI) {
 @return A struct of AAI and AA
 */
 
-function nbrs<T>(arr: Array<Array<T>>, loc: Vec2, diag: String = "udlr") {
+function nbrs<T>(arr: Array<Array<T>>, loc: Vec2, diag: Dirs) {
     var dir: Array<Vec2> = [];
     var loc = new Tup(loc);
 
-    if (diag == "udlr") dir = [{x: -1, y: 0}, {x: 0, y: -1}, {x: 0, y: 1}, {x: 1, y: 0}];
-    if (diag == "diag") dir = [{x: -1, y: -1}, {x: 1, y: -1}, {x: -1, y: 1}, {x: 1, y: 1}];
-    if (diag == "both") dir = [{x: -1, y: -1}, {x: -1, y: 0}, {x:-1, y: 1}, {x: 0, y: -1}, {x: 0, y: 1}, {x: 1, y: -1}, {x: 1, y: 0}, {x: 1, y: 1}];
+    if (diag == udlr) dir = [{x: -1, y: 0}, {x: 0, y: -1}, {x: 0, y: 1}, {x: 1, y: 0}];
+    if (diag == diag) dir = [{x: -1, y: -1}, {x: 1, y: -1}, {x: -1, y: 1}, {x: 1, y: 1}];
+    if (diag == all) dir = [{x: -1, y: -1}, {x: -1, y: 0}, {x:-1, y: 1}, {x: 0, y: -1}, {x: 0, y: 1}, {x: 1, y: -1}, {x: 1, y: 0}, {x: 1, y: 1}];
     var indices: Array<Vec2> = [];
     var vals: Array<T> = [];
     for (i in dir) {
