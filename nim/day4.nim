@@ -42,7 +42,7 @@ proc checkX(matrix: SC): int =
       for c_ind, c_val in r_val:
         if c_val != 'A':
           continue
-        let tmp = nbrs(matrix, (r_ind, c_ind), 'd')[1].join("")
+        let tmp = nbrs(matrix, (r_ind, c_ind), diags)[1].join("")
         if tmp in ["MMSS", "SSMM", "SMSM", "MSMS"]:
           inc result
 
