@@ -29,8 +29,6 @@ main :: proc() {
 parse_file :: proc(filepath: string) -> (arr: [ROWS][COLS]rune, ants: map[rune][dynamic][2]int) {
 	data, ok := os.read_entire_file(filepath)
 	if !ok do return
-	defer delete(data)
-	
 	it := string(data)
 	
     r_ind := 0
