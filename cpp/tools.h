@@ -145,16 +145,9 @@ std::string tJoin(const T &arr, const char delim) {
  * @param arr The container to join
  * @return A string with all elements of arr joined together
  */
-template <typename T>
-std::string tJoin(const T &arr) {
-  std::string str{""};
-  for (size_t i{0}; i < arr.size(); ++i) {
-    if (i < arr.size() - 1) {
-      str += arr.at(i);
-    } else
-      str += arr.at(i);
-  }
-  return str;
+template <std::ranges::range R>
+std::string tJoin(const R& arr) {
+    return std::string(std::ranges::begin(arr), std::ranges::end(arr));
 }
 
 /**
@@ -263,9 +256,10 @@ std::array<T, N> operator+(const std::array<T, N> &arr,
 template <typename T, std::size_t N>
 std::array<T, N> operator+(const std::array<T, N> &arr,
                            const std::vector<T> &arr2) {
-  std::vector<T> result{};
-  for (size_t i{0}; i < arr.size(); i++) {
-    result.emplace_back(arr[i] + arr2[i]);
+  assert(arr2.size() >= N); // optional safety check
+  std::array<T, N> result{};
+  for (size_t i = 0; i < N; ++i) {
+    result[i] = arr[i] + arr2[i];
   }
   return result;
 }
@@ -372,28 +366,21 @@ bool inBounds(const pi &pos, size_t height, size_t width) {
 
 enum class Direction { Udlr, Diags, All };
 
-template <typename V, std::size_t N>
-struct Nbrs {
-  std::array<std::pair<int, int>, N> indices;
-  std::array<V, N> vals;
-  std::size_t size = 0;  // To keep track of actual filled elements
-};
+template <typename T, std::size_t N>
+constexpr std::array<T, N> filled_array(const T& value) {
+    std::array<T, N> arr{};
+    for (auto& elem : arr) {
+        elem = value;
+    }
+    return arr;
+}
 
 template <typename V, std::size_t N>
-Nbrs<V, N> get_vals(std::span<const std::vector<V>> mat, std::span<pi> arr,
-                    const pi &pos, size_t height, size_t width) {
-  Nbrs<V, N> result;
- for (size_t idx = 0; idx < arr.size(); ++idx) {
-    const auto& offset = arr[idx];
-    pi tmp = {pos.first + offset.first, pos.second + offset.second};
-    if (inBounds(tmp, height, width)) {
-        result.indices[result.size] = tmp;
-        result.vals[result.size] = arrValue(mat, tmp);
-        ++result.size;
-    }
-}
-  return result;
-}
+struct Nbrs {
+    std::array<pi, N> indices = filled_array<std::pair<int, int>, N>({0, 0});
+    std::array<V, N> vals = filled_array<V, N>(V{});
+    std::size_t size = 0;
+};
 
 /**
  * @brief Finds the neighbors of a given location in a 2D vector
@@ -406,7 +393,24 @@ Nbrs<V, N> get_vals(std::span<const std::vector<V>> mat, std::span<pi> arr,
  */
 
 template <typename V, std::size_t N>
+Nbrs<V, N> get_vals(std::span<const std::vector<V>> mat, std::span<pi> arr,
+                    const pi &pos, size_t height, size_t width) {
+  Nbrs<V, N> result;
+  for (size_t idx = 0; idx < arr.size(); ++idx) {
+    const auto& offset = arr[idx];
+    pi tmp = {pos.first + offset.first, pos.second + offset.second};
+    if (inBounds(tmp, height, width)) {
+        result.indices[result.size] = tmp;
+        result.vals[result.size] = arrValue(mat, tmp);
+        ++result.size;
+    }
+}
+  return result;
+}
+
+template <typename V, std::size_t N>
 Nbrs<V, N> nbrs(std::span<const std::vector<V>> mat, const pi &pos, Direction type) {
+  assert(!mat.empty() && !mat[0].empty());
   auto height = mat.size();
   auto width = mat[0].size();
 
@@ -477,4 +481,3 @@ struct pair_hash {
     return h1 ^ (h2 * 31);  // Use a prime multiplier
   }
 };
-
