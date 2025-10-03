@@ -364,8 +364,13 @@ bool inBounds(const pi &pos, size_t height, size_t width) {
           static_cast<size_t>(pos.second) < width);
 }
 
-enum class Direction { Udlr, Diags, All };
-
+/**
+ * @brief Fills an array with a given value
+ * @param value The value to fill the array with
+ * @return An array of size N filled with the value
+ * @details This function creates an array of size N and fills it with the given value.
+ * It is marked as constexpr, meaning it can be evaluated at compile-time.
+ */
 template <typename T, std::size_t N>
 constexpr std::array<T, N> filled_array(const T& value) {
     std::array<T, N> arr{};
@@ -382,16 +387,22 @@ struct Nbrs {
     std::size_t size = 0;
 };
 
+
+
 /**
- * @brief Finds the neighbors of a given location in a 2D vector
+ * @brief Returns the neighbors of a given location in a 2D vector
  *
- * @param arr The 2D vector to search for neighbors
- * @param loc The location to search for neighbors
- * @param type The type of neighbors to search for. 'n' for non-diagonal
- * neighbors, 'd' for diagonal neighbors, 'a' for all neighbors
+ * This function takes a 2D vector, a location, and a span of pairs representing
+ * the offsets to search for neighbors, and returns a struct containing the
+ * indices and values of the neighbors.
+ *
+ * @param mat The 2D vector to search for neighbors
+ * @param arr The span of pairs representing the offsets to search for neighbors
+ * @param pos The location to search for neighbors
+ * @param height The height of the 2D vector
+ * @param width The width of the 2D vector
  * @return A struct containing the indices and values of the neighbors
  */
-
 template <typename V, std::size_t N>
 Nbrs<V, N> get_vals(std::span<const std::vector<V>> mat, std::span<pi> arr,
                     const pi &pos, size_t height, size_t width) {
@@ -408,6 +419,19 @@ Nbrs<V, N> get_vals(std::span<const std::vector<V>> mat, std::span<pi> arr,
   return result;
 }
 
+enum class Direction { Udlr, Diags, All };
+
+/**
+ * @brief Finds the neighbors of a given location in a 2D vector
+ *
+ * This function takes a 2D vector, a location, and a direction type, and
+ * returns a struct containing the indices and values of the neighbors.
+ *
+ * @param mat The 2D vector to search for neighbors
+ * @param pos The location to search for neighbors
+ * @param type The type of neighbors to search for (All, Diags, Udlr)
+ * @return A struct containing the indices and values of the neighbors
+ */
 template <typename V, std::size_t N>
 Nbrs<V, N> nbrs(std::span<const std::vector<V>> mat, const pi &pos, Direction type) {
   assert(!mat.empty() && !mat[0].empty());
@@ -443,15 +467,15 @@ auto pairToStr(const std::pair<T, T> &pair) -> std::string {
   return std::to_string(pair.first) + "," + std::to_string(pair.second);
 }
 
+/**
+ * @brief Converts a string representation of a pair to a std::pair of type T
+ *
+ * @tparam T The type of elements in the returned pair
+ * @param str The string containing the pair, formatted as "first,second"
+ * @return A std::pair with the elements parsed from the string
+ */
 template <typename T>
 auto strToPair(std::string str) -> std::pair<T, T> {
-  /**
-   * @brief Converts a string representation of a pair to a std::pair of type T
-   *
-   * @tparam T The type of elements in the returned pair
-   * @param str The string containing the pair, formatted as "first,second"
-   * @return A std::pair with the elements parsed from the string
-   */
 
   std::stringstream ss(str);
   T first, second;
