@@ -13,7 +13,7 @@ dirs: [4][2]int = {{-1, 0}, {0, 1}, {1, 0}, {0, -1}}
 
 main :: proc() {
 	arena: vm.Arena
-	err := vm.arena_init_growing(&arena, 1 * mem.Megabyte)
+	err := vm.arena_init_static(&arena, 1 * mem.Megabyte)
 	assert(err == .None)
 	arena_allocator := vm.arena_allocator(&arena)
 	context.allocator = arena_allocator
@@ -70,7 +70,7 @@ solution :: proc(
 		next_pos := pos + dirs[facing]
 		if Tools.arrValue(mat, next_pos) == '#' {
 			facing += 1
-			facing = facing %% 4
+			facing %= 4
 		} else {
 			visited[{pos[0], pos[1]}] = {}
 			pos = next_pos
@@ -106,7 +106,7 @@ solution2 :: proc(
 					ttl += 1
 					break
 				}
-				facing = facing %% 4
+				facing %= 4
 			} else do pos = next_pos
 		}
 		mat[i[0]][i[1]] = '.'
@@ -116,5 +116,3 @@ solution2 :: proc(
 
 	return
 }
-
-
