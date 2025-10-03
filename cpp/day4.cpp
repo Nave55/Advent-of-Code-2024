@@ -43,7 +43,6 @@ auto checkX(const vvc &mat) -> int {
     for (size_t j = 0; j < mat[0].size(); j++) {
       if (mat[i][j] != 'A') continue;
       auto n = nbrs<char, 4>(mat, {i, j}, Direction::Diags);
-      // if (n.size != 4) continue;
       auto tmp = tJoin(n.vals);
       if (tmp == "MMSS" || tmp == "SSMM" || tmp == "SMSM" || tmp == "MSMS")
         ttl++;
