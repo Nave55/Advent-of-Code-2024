@@ -9,7 +9,7 @@ import "core:strings"
 
 ROWS :: 130
 COLS :: 130
-DIRS: [4][2]int = {{-1, 0}, {0, 1}, {1, 0}, {0, -1}}
+dirs: [4][2]int = {{-1, 0}, {0, 1}, {1, 0}, {0, -1}}
 
 main :: proc() {
 	arena: vm.Arena
@@ -20,7 +20,7 @@ main :: proc() {
 	defer vm.arena_destroy(&arena)
 
 	start, locs, mat := parse_file("input/day6.txt")
-	visited := solution(start, locs, &mat)
+	visited := solution(start, locs, mat)
 	ttl2 := solution2(start, locs, &mat, visited)
 
 	fmt.printfln("Part 1: %v\nPart 2: %v", len(visited), ttl2)
@@ -58,18 +58,17 @@ inbounds :: proc(pos: [2]int) -> bool {
 solution :: proc(
 	pos: [2]int,
 	locs: map[[2]int]int,
-	mat: ^[ROWS][COLS]rune,
+	mat: [ROWS][COLS]rune,
 ) -> (
-	visited: map[[2]int]struct {
-	},
+	visited: map[[2]int]struct {},
 ) {
 
 	facing := 0
 	pos := pos
 
 	for inbounds(pos) {
-		next_pos := pos + DIRS[facing]
-		if Tools.arrValue(mat, next_pos, rune) == '#' {
+		next_pos := pos + dirs[facing]
+		if Tools.arrValue(mat, next_pos) == '#' {
 			facing += 1
 			facing = facing %% 4
 		} else {
@@ -86,8 +85,7 @@ solution2 :: proc(
 	pos: [2]int,
 	locs: map[[2]int]int,
 	mat: ^[ROWS][COLS]rune,
-	empty: map[[2]int]struct {
-	},
+	empty: map[[2]int]struct {},
 ) -> (
 	ttl := 0,
 ) {
@@ -100,8 +98,8 @@ solution2 :: proc(
 		locs[i] = 0
 
 		for inbounds(pos) {
-			next_pos := pos + DIRS[facing]
-			if Tools.arrValue(mat, next_pos, rune) == '#' {
+			next_pos := pos + dirs[facing]
+			if Tools.arrValue(mat^, next_pos) == '#' {
 				facing += 1
 				locs[next_pos] += 1
 				if locs[next_pos] == 4 {
@@ -118,3 +116,4 @@ solution2 :: proc(
 
 	return
 }
+
