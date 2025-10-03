@@ -58,11 +58,7 @@ auto solution() -> void {
   std::string line;
   vvc arr;
 
-  while (std::getline(file, line)) {
-    auto a = std::ranges::to<vc>(line);
-    arr.emplace_back(a);
-  }
-
+  while (std::getline(file, line)) arr.emplace_back(std::ranges::to<vc>(line));
   printf("Part 1: %d\nPart 2: %d\n", checkXmas(arr), checkX(arr));
 }
 
