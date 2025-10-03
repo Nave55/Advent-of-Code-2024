@@ -43,6 +43,7 @@ auto checkX(const vvc &mat) -> int {
     for (size_t j = 0; j < mat[0].size(); j++) {
       if (mat[i][j] != 'A') continue;
       auto n = nbrs<char, 4>(mat, {i, j}, Direction::Diags);
+      // if (n.size != 4) continue;
       auto tmp = tJoin(n.vals);
       if (tmp == "MMSS" || tmp == "SSMM" || tmp == "SMSM" || tmp == "MSMS")
         ttl++;
@@ -58,10 +59,7 @@ auto solution() -> void {
   std::string line;
   vvc arr;
 
-  while (std::getline(file, line)) {
-    auto s = std::ranges::to<vc>(line);
-    arr.emplace_back(s);
-  }
+  while (std::getline(file, line)) arr.emplace_back(std::ranges::to<vc>(line));
   printf("Part 1: %d\nPart 2: %d\n", checkXmas(arr), checkX(arr));
 }
 
