@@ -17,7 +17,7 @@ inboundsFixed :: proc(mat: [$N][$M]$T, pos: [2]int) -> bool {
 	return pos.x >= 0 && pos.x < len(mat) && pos.y >= 0 && pos.y < len(mat[0])
 }
 
-inbound :: proc {
+inbounds :: proc {
 	inboundsFixed,
 	inboundsSlice,
 }
