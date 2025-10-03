@@ -1,12 +1,7 @@
 package tools
 
 import sa "core:container/small_array"
-import "core:fmt"
-import "core:os"
-import "core:strconv"
-import "core:strings"
 import "core:text/regex"
-import "core:unicode/utf8"
 
 Dirs :: enum {
 	Udlr,
@@ -14,12 +9,30 @@ Dirs :: enum {
 	All,
 }
 
-inbounds :: proc(mat: [][]$T, pos: [2]int) -> bool {
+inboundsSlice :: proc(mat: [][]$T, pos: [2]int) -> bool {
 	return pos.x >= 0 && pos.x < len(mat) && pos.y >= 0 && pos.y < len(mat[0])
 }
 
-arrValue :: proc(mat: [][]$T, pos: [2]int) -> T {
+inboundsFixed :: proc(mat: [$N][$M]$T, pos: [2]int) -> bool {
+	return pos.x >= 0 && pos.x < len(mat) && pos.y >= 0 && pos.y < len(mat[0])
+}
+
+inbound :: proc {
+	inboundsFixed,
+	inboundsSlice,
+}
+
+arrValueSlice :: proc(mat: [][]$T, pos: [2]int) -> T {
 	return mat[pos.x][pos.y]
+}
+
+arrValueFixed :: proc(mat: [$N][$M]$T, pos: [2]int) -> T {
+	return mat[pos.x][pos.y]
+}
+
+arrValue :: proc {
+	arrValueFixed,
+	arrValueSlice,
 }
 
 getDirs :: proc(
