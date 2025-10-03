@@ -17,9 +17,14 @@ inboundsFixed :: proc(mat: [$N][$M]$T, pos: [2]int) -> bool {
 	return pos.x >= 0 && pos.x < len(mat) && pos.y >= 0 && pos.y < len(mat[0])
 }
 
+inboundsWH :: proc(pos: [2]$T, width, height: T) -> bool {
+	return (pos.x >= 0 && pos.x < height && pos.y >= 0 && pos.y < width)
+}
+
 inbounds :: proc {
 	inboundsFixed,
 	inboundsSlice,
+	inboundsWH,
 }
 
 arrValueSlice :: proc(mat: [][]$T, pos: [2]int) -> T {
@@ -102,8 +107,3 @@ regexFind :: proc(str, pattern: string, slide: int = 1) -> (arr: [dynamic]regex.
 	
 	return
 }
-
-inBounds :: proc(pos: [2]$T, width, height: T) -> bool {
-	return (pos.x >= 0 && pos.x < height && pos.y >= 0 && pos.y < width)
-}
-
