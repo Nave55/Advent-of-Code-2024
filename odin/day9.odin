@@ -41,13 +41,13 @@ parse_file :: proc(
 	for i, ind in it {
 		times := int(i) - int('0')
 		if ind % 2 == 0 {
-			for j in 0 ..< times do append(&arr, pos)
+			for _ in 0 ..< times do append(&arr, pos)
 			if times > 0 {
 				append(&filled, file_info{pos, idx, times})
 				pos += 1
 			}
 		} else {
-			for j in 0 ..< times do append(&arr, neg)
+			for _ in 0 ..< times do append(&arr, neg)
 			if times > 0 {
 				append(&empty, file_info{-1, idx, times})
 				neg -= 1
@@ -78,8 +78,8 @@ solveTwo :: proc(
 ) -> (
 	ttl: int,
 ) {
-	#reverse for &f_val, f_ind in filled {
-		for &e_val, e_ind in empty {
+	#reverse for &f_val in filled {
+		for &e_val in empty {
 			if f_val.pos <= e_val.pos do break
 			if f_val.size <= e_val.size {
 				f_val.pos = e_val.pos
