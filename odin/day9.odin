@@ -37,7 +37,7 @@ parse_file :: proc(
 	data := os.read_entire_file(filepath) or_return
 	it := string(data)
 
-	pos, neg, idx := 0, -1, 0
+	pos, idx := 0, -1
 	for i, ind in it {
 		times := int(i) - int('0')
 		if ind % 2 == 0 {
@@ -47,10 +47,9 @@ parse_file :: proc(
 				pos += 1
 			}
 		} else {
-			for _ in 0 ..< times do append(&arr, neg)
+			for _ in 0 ..< times do append(&arr, -1)
 			if times > 0 {
 				append(&empty, file_info{-1, idx, times})
-				neg -= 1
 			}
 		}
 		idx += times
@@ -60,14 +59,18 @@ parse_file :: proc(
 }
 
 solve :: proc(arr: ^[dynamic]int) -> (ttl: int) {
-	for i, ind in arr {
-		if i < 0 {
-			pop_val := pop(arr)
-			for pop_val < 0 do pop_val = pop(arr)
-			if ind >= len(arr) do break
-			ttl += ind * pop_val
-			arr[ind] = pop_val
-		} else do ttl += ind * i
+	i := 0
+	for i < len(arr) {
+		if arr[i] == -1 {
+			pop_val := 0
+			for {
+				pop_val = pop(arr)
+				if pop_val >= 0 do break
+			}
+			ttl += i * pop_val
+			if i < len(arr) do arr[i] = pop_val
+		} else do ttl += i * arr[i]
+		i += 1
 	}
 	return
 }
