@@ -1,97 +1,67 @@
-import sequtils, strutils, sugar, tables, algorithm, strformat
+import strutils, strformat
 
 type
-  SI = seq[int]
-  HISI = Table[int, SI]
-  Info = object
-    top: int
-    m_spaces: int
+  FileInfo = ref object
+    val: int
+    pos: int
     size: int
+  SI = seq[int]
+  SFI = seq[FileInfo]
 
-proc readInput: SI =
-  result = readFile("input/day9.txt")
-          .multiReplace({ "\r": "", "\n": "" })
-          .map(item => ord(item) - ord('0'))
+proc readInput: (SI, SFI, SFI) =
+  var
+    f_val = 0
+    idx = 0
 
-proc diskMap(str: SI): (HISI, HISI, Info) =
-  result[0][-1] = @[]
-  var tmp = -1
-  var contig = 0
-  for ind, val in str:
-    let v = ind div 2
-    discard result[0].hasKeyOrPut(v, @[])
-    for i in 0..<val:
-      inc tmp
-      if ind mod 2 == 0:
-        result[0][v] &= tmp
-      else:
-        result[0][-1].insert(tmp, 0)
-        inc contig
-    if ind mod 2 == 0 and val > 0:
-      if contig > 0:
-        let p = tmp - val - contig + 1
-        discard result[1].hasKeyOrPut(contig, @[])
-        result[1][contig].insert(p, 0)
-      contig = 0
-    elif val > 0:
-      result[2].m_spaces = max(result[2].m_spaces, val)
-    result[2].top = max(result[2].top, v)
-  result[2].size = tmp 
-  for i in 0..<result[2].m_spaces:
-    discard result[1].hasKeyOrPut(i, @[])
+  for ind, i in readFile("input/day9.txt").strip():
+    let times = ord(i) - ord('0')
+    if ind mod 2 == 0:
+      for _ in 0 ..< times:
+        result[0] &= f_val
+      if times > 0:
+        result[1] &= FileInfo(val: f_val, pos: idx, size: times)
+        inc f_val
+    else:
+      for _ in 0 ..< times:
+        result[0] &= -1
+      if times > 0:
+        result[2] &= FileInfo(val: -1, pos: idx, size: times)
+    idx += times
 
-proc orderDisk(p: HISI, info: Info): SI =
-  var pos = p
-  result = collect: 
-    for i in 0..info.size: -1
-  for i in 0..info.top:
-    for j in pos[i]:
-      result[j] = i
-  for i in countdown(result.len() - 1, 0):
-    if result[i] != -1 and pos[-1].len() > 0:
-      let popped = pos[-1].pop()
-      if popped < i:
-        result[i].swap(result[popped])
+proc solution(arr: var SI): int =
+  var i = 0
+  while i < arr.len:
+    if arr[i] < 0:
+      var pop_val: int
+      while true:
+        pop_val = arr.pop
+        if pop_val >= 0:
+          break
+      result += i * pop_val
+      if i < arr.len:
+        arr[i] = pop_val
+    else:
+      result += i * arr[i]
+    inc i
 
-proc orderDisk2(pos: HISI, e: HISI, info: Info): SI =
-  var empty = e
-  var n_pos = pos
-  for i in countdown(info.top, 1):
-    var l = pos[i].len()
-    var lowest = info.size
-    for j in l..info.top:
-      discard empty.hasKeyOrPut(j, @[])
-      if empty[j].len() > 0 and empty[j][^1] < lowest:
-        l = j
-        lowest = empty[j][^1]
-    if empty[l].len() == 0: continue
-    if empty.hasKey(l) and pos[i].len() > 0 and empty[l][^1] < pos[i][0]:
-      let popped = empty[l].pop()
-      let dif = l - n_pos[i].len()
-      var tmp = collect: 
-        for k in popped..<popped + l - dif: k
-      empty[dif] &= popped + l - dif
-      empty[dif].sort((a, b) => cmp(b, a))
-      n_pos[i] = tmp
+proc solutionTwo(filled: var SFI, empty: var SFI): int =
+  for i in countdown(filled.high, 0):
+    for j in 0 ..< empty.len:
+      if filled[i].pos <= empty[j].pos:
+        break
+      if filled[i].size <= empty[j].size:
+        filled[i].pos = empty[j].pos
+        empty[j].size -= filled[i].size
+        empty[j].pos += filled[i].size
+        break
 
-  result = collect: 
-    for i in 0..<info.size: -1
-  for i in 0..info.top:
-    if n_pos[i].len() > 0:
-      for j in n_pos[i]:
-        result[j] = i
+  for i in filled:
+    for ind in i.pos ..< i.pos + i.size:
+      result += i.val * ind  
 
-func solution(o_disk: SI): int =
-  for ind, val in o_disk:
-    if val != -1:
-      result += ind * val
-
+var (arr, filled, empty) = readInput()
 let
-  s_seq = readInput()
-  (pos, empty, info) = diskMap(s_seq)
-  o_disk1 = orderDisk(pos, info)
-  o_disk2 = orderDisk2(pos, empty, info)
-  pt1 = solution(o_disk1)
-  pt2 = solution(o_disk2)
+  pt1 = solution(arr)
+  pt2 = solutionTwo(filled, empty)
 
 echo &"Part 1: {pt1}\nPart 2: {pt2}"
