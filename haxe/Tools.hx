@@ -37,6 +37,39 @@ typedef MI64 = Map<Int,    Int64>;
 typedef MS64 = Map<String, Int64>;
 
 /**
+ * [String Iterator]
+ 
+    Example:
+
+        var str = "esbzops qjh qfo";
+
+        for (i in new StringIterator(str, true)) {
+            trace(i);       
+        }
+
+@param str String
+@param lower Bool
+@return String
+*/
+
+class StringIterator {
+    var str: String;
+    var end: Int;
+    var i: Int;
+  
+    public inline function new(str: String, lower: Bool = false) {
+        lower == true ? this.str = str.toLowerCase() : this.str = str;
+        this.i = 0;
+        this.end = str.length;
+    }
+  
+    public inline function hasNext() return i < end;
+    public inline function next() {
+        return str.charAt(i++);
+    } 
+}
+
+/**
  * [Reverse Iterator]
  
     Example:
@@ -228,16 +261,16 @@ enum Dirs {
 @return A struct of AAI and AA
 */
 
-function nbrs<T>(arr: Array<Array<T>>, loc: Vec2, diag: Dirs) {
-    var dir: Array<Vec2> = [];
+function nbrs<T>(arr: Array<Array<T>>, loc: Vec2, dir: Dirs = udlr) {
+    var dirs: Array<Vec2> = [];
     var loc = new Tup(loc);
 
-    if (diag == udlr) dir = [{x: -1, y: 0}, {x: 0, y: -1}, {x: 0, y: 1}, {x: 1, y: 0}];
-    if (diag == diag) dir = [{x: -1, y: -1}, {x: 1, y: -1}, {x: -1, y: 1}, {x: 1, y: 1}];
-    if (diag == all) dir = [{x: -1, y: -1}, {x: -1, y: 0}, {x:-1, y: 1}, {x: 0, y: -1}, {x: 0, y: 1}, {x: 1, y: -1}, {x: 1, y: 0}, {x: 1, y: 1}];
+    if (dir == udlr) dirs = [{x: -1, y: 0}, {x: 0, y: -1}, {x: 0, y: 1}, {x: 1, y: 0}];
+    if (dir == diags) dirs = [{x: -1, y: -1}, {x: 1, y: -1}, {x: -1, y: 1}, {x: 1, y: 1}];
+    if (dir == all)   dirs = [{x: -1, y: -1}, {x: -1, y: 0}, {x:-1, y: 1}, {x: 0, y: -1}, {x: 0, y: 1}, {x: 1, y: -1}, {x: 1, y: 0}, {x: 1, y: 1}];
     var indices: Array<Vec2> = [];
     var vals: Array<T> = [];
-    for (i in dir) {
+    for (i in dirs) {
         var tmp = loc + i;
         if (tmp.x != -1 && tmp.y != -1 && tmp.x != arr.length && tmp.y != arr[0].length) {
             indices.push(tmp);
