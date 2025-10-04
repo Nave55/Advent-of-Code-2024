@@ -29,20 +29,18 @@ proc readInput: (SI, SFI, SFI) =
     idx += times
 
 proc solution(arr: var SI): int =
-  var i = 0
-  while i < arr.len:
-    if arr[i] < 0:
-      var pop_val: int
-      while true:
-        pop_val = arr.pop
-        if pop_val >= 0:
-          break
-      result += i * pop_val
-      if i < arr.len:
-        arr[i] = pop_val
-    else:
+  var j = arr.len - 1
+
+  for i in 0 ..< arr.len:
+    if arr[i] == -1:
+      while j > i and arr[j] < 0:
+        dec j
+      if j <= i:
+        break
+      arr[i] = arr[j]
+      arr[j] = -1
+    if arr[i] >= 0:
       result += i * arr[i]
-    inc i
 
 proc solutionTwo(filled: var SFI, empty: var SFI): int =
   for i in countdown(filled.high, 0):
