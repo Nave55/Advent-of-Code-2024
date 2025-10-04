@@ -37,7 +37,7 @@ parse_file :: proc(
 	data := os.read_entire_file(filepath) or_return
 	it := string(data)
 
-	pos, idx := 0, -1
+	pos, idx := 0, 0
 	for i, ind in it {
 		times := int(i) - int('0')
 		if ind % 2 == 0 {
