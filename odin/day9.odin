@@ -59,20 +59,19 @@ parse_file :: proc(
 }
 
 solve :: proc(arr: ^[dynamic]int) -> (ttl: int) {
-	i := 0
-	for i < len(arr) {
+	j := len(arr) - 1
+
+	for i in 0 ..< len(arr) {
 		if arr[i] == -1 {
-			pop_val := 0
-			for {
-				pop_val = pop(arr)
-				if pop_val >= 0 do break
-			}
-			ttl += i * pop_val
-			if i < len(arr) do arr[i] = pop_val
-		} else do ttl += i * arr[i]
-		i += 1
+			for j > i && arr[j] < 0 do j -= 1
+			if j <= i do break
+			arr[i] = arr[j]
+			arr[j] = -1
+		}
+		if arr[i] >= 0 do ttl += i * arr[i] 
 	}
-	return
+	
+	return ttl
 }
 
 solveTwo :: proc(
@@ -101,3 +100,4 @@ solveTwo :: proc(
 
 	return ttl
 }
+
