@@ -42,6 +42,7 @@ auto solution(const char* path) -> void {
                  return value;
                }) |
                std::ranges::to<vi>();
+
     if (checkSafety(vec)) ttl1++;
     if (checkSafetyTwo(vec)) ttl2++;
   }
