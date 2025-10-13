@@ -1,60 +1,48 @@
 fn main() {
-    let arr = read_input("day1.txt");
-    solve(&arr)
+    let con = parse_input();
+    solution(&con);
 }
 
-fn read_input(path: &str) -> Vec<Vec<i32>> {
-    let data = std::fs::read_to_string(path).expect("Bad File Path");
-
-    let arr: Vec<Vec<i32>> = data
-        .lines()
-        .map(|line| {
-            line.split_whitespace()
-                .filter_map(|num| num.parse::<i32>().ok())
-                .collect()
-        })
-        .collect();
-
-    arr
+fn parse_input() -> Vec<Vec<i32>> {
+    let con = std::fs::read_to_string("../inputs/day2.txt").unwrap();
+    con
+    .lines()
+    .map(|line| {
+        line.split_whitespace()
+            .filter_map(|n| n.parse::<i32>().ok())
+            .collect()
+    }).collect()
 }
 
 fn check_safety(arr: &[i32]) -> bool {
-    if arr.len() <= 1 {
-        return true;
-    }
-
-    let is_increasing_and_safe = arr.windows(2).all(|w| {
-        let diff = w[1] - w[0];
-        (diff > 0) && (diff <= 3)
-    });
-
-    let is_decreasing_and_safe = arr.windows(2).all(|w| {
-        let diff = w[0] - w[1];
-        (diff > 0) && (diff <= 3)
-    });
-
-    is_increasing_and_safe || is_decreasing_and_safe
+    let dec = arr.windows(2).all(|w| (1..=3).contains(&(w[0] - w[1])));
+    let inc = arr.windows(2).all(|w| (1..=3).contains(&(w[1] - w[0])));
+    dec || inc
 }
 
-fn check_safety_two(arr: &[i32]) -> bool {
+fn check_safety2(arr: &[i32]) -> bool {
     if check_safety(arr) {
         return true;
     }
 
-    for i in 0..arr.len() {
-        let mut temp = arr.to_vec();
-        temp.remove(i);
-        if check_safety(&temp) {
-            return true;
+    (0..arr.len()).any(|i| {
+        let tmp = arr[..i].iter().chain(&arr[i + 1..]).copied().collect::<Vec<_>>();
+        check_safety(&tmp)
+    })
+}
+
+fn solution(con: &[Vec<i32>]) {
+    let mut ttl1 = 0;
+    let mut ttl2 = 0;
+
+    for i in con {
+        if check_safety(&i) {
+            ttl1 += 1;
+        }
+        if check_safety2(&i) {
+            ttl2 += 1;
         }
     }
 
-    false
-}
-
-fn solve(arr: &Vec<Vec<i32>>) {
-    let pt1 = arr.iter().filter(|l| check_safety(l)).count();
-    let pt2 = arr.iter().filter(|l| check_safety_two(l)).count();
-
-    println!("Part 1: {pt1}\nPart 2: {pt2}")
+    println!("Part 1: {ttl1}\nPart 2: {ttl2}")
 }
