@@ -8,25 +8,24 @@ class Day2 {
     }
 
     static function checkSafety(arr: AI): Bool {
-        if (arr.length <= 1) return true;
+        var n = arr.length - 1;
+        if (n < 0) return true;
         
-        var is_inc_safe = true, is_dec_safe = true;
-        for (i in 0...arr.length - 1) {
-            if (!is_inc_safe && !is_dec_safe) return false;
-            var val = arr[i] - arr[i + 1]; 
-            if (is_inc_safe) is_inc_safe = val >= 1 && val <= 3; 
-            if (is_dec_safe) is_dec_safe = val <= -1 && val >= -3; 
+        var dec = 0, inc = 0;
+        for (i in 0 ... arr.length - 1) {
+            var val = arr[i] - arr[i + 1];
+            if (val >= 1 && val <= 3) dec++;
+            if (val <= -1 && val >= -3) inc++;
         }
 
-        return is_inc_safe || is_dec_safe;
+        return dec == n || inc == n;
     }
 
     static function checkSafetyTwo(arr: AI): Bool {
         if (checkSafety(arr)) return true;
 
         for (ind => _ in arr) {
-            var tmp = [for (i in arr) i];
-            tmp.splice(ind, 1);
+            var tmp = arr.slice(0, ind).concat(arr.slice(ind + 1));
             if (checkSafety(tmp)) return true;
         }
 
