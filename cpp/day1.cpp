@@ -1,6 +1,4 @@
 #include "tools.h"
-#include <tl/getlines.hpp>
-#include <tl/to.hpp>
 #include <fstream>
 #include <ranges>
 #include <algorithm>
@@ -11,18 +9,24 @@ auto solution() -> Pt1Pt2;
 
 auto main() -> int {
     auto [sum1, sum2] =  solution();
-    printf("Part 1: %d\nPart 2: %d", sum1, sum2);
+    printf("Part 1: %d\nPart 2: %d\n", sum1, sum2);
 }
 
 auto solution() -> Pt1Pt2 {
-    std::ifstream file ("input/Day1.txt");
-    auto lines = tl::views::getlines(file) | tl::to<std::vector<std::string>>();
+    std::ifstream file ("input/day1.txt");
+    assert(file);
+    std::string line;
     vi left {}, right {};
 
-    for (const auto &i : lines) {
-        auto tmp = std::views::split(i, std::string_view("   ")) | tl::to<std::vector<std::string>>();
-        left.emplace_back(std::stoi(tmp[0]));
-        right.emplace_back(std::stoi(tmp[1]));
+    while (std::getline(file, line)) {
+        auto tmp = line 
+            | std::views::split(std::string_view("   ")) 
+            | std::views::transform([](auto x) {return std::stoi(std::string(x.begin(), x.end()));}) 
+            | std::ranges::to<std::vector<int>>();
+
+       
+        left.emplace_back(tmp[0]);
+        right.emplace_back(tmp[1]);
     }
 
     std::sort(left.begin(), left.end());
