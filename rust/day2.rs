@@ -32,17 +32,8 @@ fn check_safety2(arr: &[i32]) -> bool {
 }
 
 fn solution(con: &[Vec<i32>]) {
-    let mut ttl1 = 0;
-    let mut ttl2 = 0;
+    let ttl1 = con.iter().filter(|v| check_safety(v)).count();
+    let ttl2 = con.iter().filter(|v| check_safety2(v)).count();
 
-    for i in con {
-        if check_safety(&i) {
-            ttl1 += 1;
-        }
-        if check_safety2(&i) {
-            ttl2 += 1;
-        }
-    }
-
-    println!("Part 1: {ttl1}\nPart 2: {ttl2}")
+    println!("Part 1: {ttl1}\nPart 2: {ttl2}");
 }
