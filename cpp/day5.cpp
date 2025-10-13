@@ -1,6 +1,4 @@
 #include "tools.h"
-#include <tl/getlines.hpp>
-#include <tl/to.hpp>
 #include <iostream>
 #include <fstream>
 #include <unordered_map>
@@ -16,19 +14,20 @@ auto main() -> int {
 
 auto parseFile() -> ParseFile {
     std::ifstream file ("input/day5.txt");
-    auto lines = tl::views::getlines(file) | tl::to<std::vector<std::string>>();
+    assert(file);
+    std::string line;
 
     std::unordered_map<int, vi> mp {}; 
     vvi mat {};
-    for (auto &i : lines) {
-        if (i != "") {
-            if (i.contains("|")) {
-                auto a = tSplit<int>(i, '|');
+    while (std::getline(file, line)) {
+        if (line != "") {
+            if (line.contains("|")) {
+                auto a = tSplit<int>(line, '|');
                 if (!mp.contains(a[0])) mp[a[0]] = {};
                 mp[a[0]].emplace_back(a[1]);
             }
-            if (i.contains(",")) {
-                auto a = tSplit<int>(i);
+            if (line.contains(",")) {
+                auto a = tSplit<int>(line);
                 mat.emplace_back(a);
             }
         }
@@ -37,7 +36,7 @@ auto parseFile() -> ParseFile {
 }
 
 auto sortArr(vi arr, const std::unordered_map<int, vi> &mp) -> SortArr {
-    auto sorted = false;
+    auto sorted =false;
     auto no_changes = true;
 
     while (!sorted) {
@@ -71,5 +70,5 @@ auto solution() -> void {
             if (is_sorted) pt1 += vals[n];
             else pt2 += vals[n];
         }
-    printf("Part 1:%d\nPart 2:%d", pt1, pt2);
+    printf("Part 1: %d\nPart 2: %d\n", pt1, pt2);
 }
