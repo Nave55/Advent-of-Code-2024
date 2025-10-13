@@ -24,8 +24,8 @@ class Day2 {
     static function checkSafetyTwo(arr: AI): Bool {
         if (checkSafety(arr)) return true;
 
-        for (ind => _ in arr) {
-            var tmp = arr.slice(0, ind).concat(arr.slice(ind + 1));
+        for (i in 0 ... arr.length) {
+            var tmp = arr.slice(0, i).concat(arr.slice(i + 1));
             if (checkSafety(tmp)) return true;
         }
 
