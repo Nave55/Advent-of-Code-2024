@@ -26,7 +26,7 @@ func bfs(mat: SSI, pos: TI, visited: var Visited, target: int = 9): int =
     if mat.fetchVal(current) == target:
       result += 1
 
-    let (locs, nums) = nbrs(mat, current)
+    let (locs, nums) = nbrs(mat, current, udlr)
     for ind, val in locs:
       if nums[ind] == mat.fetchVal(current) + 1 and not localVisited.contains(val):
         queue &= val
@@ -38,7 +38,7 @@ func dfs(mat: SSI, pos: TI, visited: var Visited, targetHeight: int = 9): int =
     return 1
 
   visited.incl(pos)
-  let (neighbors, _) = nbrs(mat, pos)
+  let (neighbors, _) = nbrs(mat, pos, udlr)
   for neighbor in neighbors:
     if neighbor notin visited and mat.fetchVal(neighbor) == mat.fetchVal(pos) + 1:
       result += dfs(mat, neighbor, visited)
