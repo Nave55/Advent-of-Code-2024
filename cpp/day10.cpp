@@ -1,7 +1,5 @@
 #include <print>
-#include <string>
 #include <unordered_set>
-#include <utility>
 #include "tools.h"
 
 constexpr size_t ROWS = 50;
