@@ -36,3 +36,4 @@ let (pt1, pt2) = solution()
 echo &"Part 1: {pt1}\nPart 2: {pt2}"  
 
 
+
